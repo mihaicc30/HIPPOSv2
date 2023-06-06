@@ -35,3 +35,27 @@
 input {
   outline-color: #F6F6F6;
 }
+
+
+::selection {
+  background: #00000011;
+  /* WebKit/Blink Browsers */
+}
+
+::-moz-selection {
+  background: #00000011;
+  /* Gecko Browsers */
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-drag: none;
+}
+
+button.yellow::selection {
+  background: #00000011;
+}
+
+button.yellow::-moz-selection {
+  background: #00000011;
+}

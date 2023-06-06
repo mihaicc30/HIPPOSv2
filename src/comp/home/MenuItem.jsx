@@ -63,7 +63,7 @@ const MenuItem = ({ item }) => {
 								<p className="font-bold text-xl text-end">
 									£{parseFloat(menuItem.price).toFixed(2)}
 								</p>
-								<p className="text-sm whitespace-nowrap">{menuItem.cal}</p>
+								<p className="text-sm whitespace-nowrap text-end">{menuItem.cal} kcal</p>
 							</div>
 							<div>
 								<AiFillCaretRight className=" bg-[--c1] rounded my-auto p-[2px] text-xl font-bold border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none" />

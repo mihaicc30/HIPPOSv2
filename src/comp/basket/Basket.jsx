@@ -104,7 +104,7 @@ const Basket = ({ menuitems, basketItems, setBasketItems }) => {
 							{/* <img src={item.img} alt={item.name} /> */}
 							<div className="grow flex flex-col justify-start">
 								<p className="font-bold text-xl line-clamp-1">{item.name}</p>
-								<span className="text-xs font-normal">{item.cal}</span>
+								<span className="text-xs font-normal">{item.cal} kcal</span>
 								<div className="flex gap-4 justify-start text-3xl items-center">
 									<button
 										className="px-3 py-1 rounded-full border-2"

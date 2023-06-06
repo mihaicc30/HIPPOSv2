@@ -64,7 +64,7 @@ const Auth = ({ user, setUser }) => {
 	return (
 		<div className="flex bg-[--clsec]">
 			<div className="basis-[60%] max-md:basis-[100%] flex flex-col gap-[3vh] min-h-[100svh] justify-center items-center ">
-				<div className="bg-[--c30] rounded shadow-lg shadow-[#535353] flex flex-col w-[80%] gap-[2vh] p-4 min-h-[80svh] justify-center border-2 border-[--c12]">
+				<div className="bg-[--c30] rounded shadow-lg shadow-[#535353] flex flex-col w-[80%] gap-[2vh] p-4 min-h-[80svh] justify-center border-2 border-[--c12] max-w-[650px]">
 					<p className="font-black text-3xl tracking-widest text-center">
 						HIPPOS
 					</p>

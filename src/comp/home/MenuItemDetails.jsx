@@ -59,7 +59,7 @@ const MenuItemDetails = ({ item, basketItems, setBasketItems }) => {
 				</p>
 
 				<div className="border-2 p-4 flex flex-wrap gap-4 justify-center capitalize">
-					<span>{item.cal}</span>
+					<span>{item.cal} kcal</span>
 					{item.tag &&
 						item.tag.length > 0 &&
 						item.tag.map((item, index) => <span key={index}>{item}</span>)}

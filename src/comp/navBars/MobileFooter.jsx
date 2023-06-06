@@ -63,7 +63,7 @@ const MobileFooter = ({basketQty}) => {
 				}`}
 				onClick={() => handleDivClick("Settings")}>
 				<span className="mx-auto text-2xl">
-					<MdOutlineSettingsSuggest />
+					<MdOutlineSettingsSuggest className="text-3xl"/>
 				</span>
 				<p className={activeIndex === "Settings" ? "" : "max-sm:hidden"}>
 					Settings
