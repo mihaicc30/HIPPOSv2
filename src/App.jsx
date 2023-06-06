@@ -9,7 +9,7 @@ import Home from "./comp/home/Home";
 import Auth from "./comp/isAuth/Auth";
 import Layout from "./comp/isAuth/Layout";
 import Receipts from "./comp/Receipts/Receipts";
-import Profile from "./comp/profile/Profile";
+import Settings from "./comp/Settings/Settings";
 import Signout from "./comp/signout/Signout";
 import Basket from "./comp/basket/Basket";
 import Page404 from "./comp/Page404";
@@ -734,7 +734,116 @@ const menuitems = [
 ];
 
 const App = () => {
+	// to set up later on
 	const [user, setUser] = useState(null);
+
+	// to grab from db later on
+	const [receipts, setReceipts] = useState([
+		{
+			pubName: "The White Lion",
+			address: "123 Dove Close, Worcester",
+			phone: "+447443350891",
+			website: "www.theMightyLionWebsite.com",
+			receiptNumber: "SomeCounter",
+			dateTime: "2023-06-04 14:30:00",
+			year: "2023",
+			month: "06",
+			items: [
+				{
+					item: "Avocado on Toast",
+					qty: 2,
+					price: 9,
+				},
+				{
+					item: "Full Breakfast",
+					qty: 3,
+					price: 10,
+				},
+			],
+			vat: 8.1,
+			totalAmount: 48,
+			paymentMethod: "Credit Card",
+			cardNumber: "**** **** **** 1234",
+		},
+		{
+			pubName: "The White Lion",
+			address: "123 Dove Close, Worcester",
+			phone: "+447443350891",
+			website: "www.theMightyLionWebsite.com",
+			receiptNumber: "SomeCounter",
+			dateTime: "2023-06-04 11:30:00",
+			year: "2023",
+			month: "06",
+			items: [
+				{
+					item: "Avocado on Toast",
+					qty: 2,
+					price: 9,
+				},
+				{
+					item: "Full Breakfast",
+					qty: 3,
+					price: 10,
+				},
+			],
+			vat: 8.0,
+			totalAmount: 48,
+			paymentMethod: "Credit Card",
+			cardNumber: "**** **** **** 1234",
+		},
+		{
+			pubName: "The White Lion",
+			address: "123 Dove Close, Worcester",
+			phone: "+447443350891",
+			website: "www.theMightyLionWebsite.com",
+			receiptNumber: "SomeCounter",
+			dateTime: "2023-03-04 14:30:00",
+			year: "2023",
+			month: "03",
+			items: [
+				{
+					item: "Avocado on Toast",
+					qty: 2,
+					price: 9,
+				},
+				{
+					item: "Full Breakfast",
+					qty: 3,
+					price: 10,
+				},
+			],
+			vat: 8.0,
+			totalAmount: 48,
+			paymentMethod: "Credit Card",
+			cardNumber: "**** **** **** 1234",
+		},
+		{
+			pubName: "The White Lion",
+			address: "123 Dove Close, Worcester",
+			phone: "+447443350891",
+			website: "www.theMightyLionWebsite.com",
+			receiptNumber: "SomeCounter",
+			dateTime: "2022-06-04 14:30:00",
+			year: "2022",
+			month: "06",
+			items: [
+				{
+					item: "Avocado on Toast",
+					qty: 2,
+					price: 9,
+				},
+				{
+					item: "Full Breakfast",
+					qty: 3,
+					price: 10,
+				},
+			],
+			vat: 8.0,
+			totalAmount: 48,
+			paymentMethod: "Credit Card",
+			cardNumber: "**** **** **** 1234",
+		},
+	]);
 
 	// to grab from db later on
 	const [basketItems, setBasketItems] = useState([
@@ -752,7 +861,6 @@ const App = () => {
 	};
 
 	useEffect(() => {
-		console.log("🚀 ~ file: App.jsx:757 ~ App ~ basketItems:", basketItems)
 		calculateTotalQuantity();
 	}, [user, basketItems]);
 
@@ -781,13 +889,22 @@ const App = () => {
 								<Route
 									key={itemIndex}
 									path={item.name}
-									element={<MenuItemDetails item={item} basketItems={basketItems} setBasketItems={setBasketItems}/>}
+									element={
+										<MenuItemDetails
+											item={item}
+											basketItems={basketItems}
+											setBasketItems={setBasketItems}
+										/>
+									}
 								/>
 							))}
 						</Route>
 					))}
 				</Route>
-				<Route path="/Receipts" element={<Receipts user={user} />} />
+				<Route
+					path="/Receipts"
+					element={<Receipts user={user} receipts={receipts} />}
+				/>
 				<Route
 					path="/Basket"
 					element={
@@ -799,7 +916,7 @@ const App = () => {
 						/>
 					}
 				/>
-				<Route path="/Profile" element={<Profile user={user} />} />
+				<Route path="/Settings" element={<Settings user={user} />} />
 				<Route
 					path="/Signout"
 					element={<Signout user={user} setUser={setUser} />}

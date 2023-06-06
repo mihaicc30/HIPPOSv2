@@ -78,7 +78,7 @@ const Auth = ({ user, setUser }) => {
 					</div>
 					<div className="text-center">
 						<div className="my-4 py-4 flex justify-center gap-10 text-[3rem]">
-							<FcGoogle className="transition hover:scale-[1.2] cursor-pointer" />
+							<FcGoogle className="transition hover:scale-[1.2] cursor-pointer text-[3.3rem]" />
 							<BsFacebook style={{fill:"#4267B2"}} className="transition hover:scale-[1.2] cursor-pointer"/>
 						</div>
 						<p className="text-[#bbbaba] text-sm">- Or use email -</p>

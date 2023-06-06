@@ -4,10 +4,10 @@ import { AiOutlineLeft } from "react-icons/ai";
 
 const MenuItemDetails = ({ item, basketItems, setBasketItems }) => {
 	const navigate = useNavigate();
-	const [quantity, setQuantity] = useState(0);
+	const [quantity, setQuantity] = useState(1);
 
 	const decreaseQuantity = () => {
-		if (quantity > 0) {
+		if (quantity > 1) {
 			setQuantity(quantity - 1);
 		}
 	};
@@ -17,29 +17,30 @@ const MenuItemDetails = ({ item, basketItems, setBasketItems }) => {
 	};
 
 	const addToBasket = () => {
-		const existingItem = basketItems.find((basketItem) => basketItem.item === item.name);
+		const existingItem = basketItems.find(
+			(basketItem) => basketItem.item === item.name,
+		);
 		if (existingItem) {
-		  const updatedBasket = basketItems.map((basketItem) => {
-			if (basketItem.item === item.name) {
-			  return {
-				...basketItem,
-				qty: String(parseInt(basketItem.qty) + quantity),
-			  };
-			}
-			return basketItem;
-		  });
-		  setBasketItems(updatedBasket);
+			const updatedBasket = basketItems.map((basketItem) => {
+				if (basketItem.item === item.name) {
+					return {
+						...basketItem,
+						qty: String(parseInt(basketItem.qty) + quantity),
+					};
+				}
+				return basketItem;
+			});
+			setBasketItems(updatedBasket);
 		} else {
-		  const updatedBasket = [
-			...basketItems,
-			{ item: item.name, qty: String(quantity) },
-		  ];
-		  setBasketItems(updatedBasket);
+			const updatedBasket = [
+				...basketItems,
+				{ item: item.name, qty: String(quantity) },
+			];
+			setBasketItems(updatedBasket);
 		}
 		navigate(-1);
-	  };
+	};
 
-	  
 	return (
 		<div className="fixed inset-0 z-20 bg-[--c60] flex flex-col overflow-auto">
 			<button className="mr-auto p-2 text-3xl" onClick={() => navigate(-1)}>
@@ -64,8 +65,8 @@ const MenuItemDetails = ({ item, basketItems, setBasketItems }) => {
 						item.tag.map((item, index) => <span key={index}>{item}</span>)}
 				</div>
 
-				<button className="bg-[--c1] rounded mt-4 px-3 py-1 font-bold border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none">
-					allergen info
+				<button className="bg-[--c1] rounded mt-4 px-3 py-1 font-bold border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none max-w-[500px]">
+					Allergen Info
 				</button>
 			</div>
 			<span className="grow"></span>
@@ -87,12 +88,14 @@ const MenuItemDetails = ({ item, basketItems, setBasketItems }) => {
 				</button>
 			</div>
 
-			<button
-			disabled={quantity < 1 ? true : false}
-				onClick={addToBasket}
-				className="bg-[--c1] rounded mx-6 my-4 px-3 py-1 font-bold border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none">
-				ADD TO BASKET
-			</button>
+			<div className="flex overflow-hidden w-[90%] mx-auto">
+				<button
+					disabled={quantity < 1 ? true : false}
+					onClick={addToBasket}
+					className="animate-fadeUP1 w-[100%] bg-[--c1] rounded mx-6 my-4 px-3 py-1 font-bold border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none">
+					ADD TO BASKET
+				</button>
+			</div>
 		</div>
 	);
 };

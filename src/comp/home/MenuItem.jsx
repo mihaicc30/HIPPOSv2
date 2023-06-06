@@ -8,7 +8,7 @@ import {
 	useNavigate,
 	useLocation,
 } from "react-router-dom";
-import { AiOutlineLeft } from 'react-icons/ai';
+import { AiOutlineLeft, AiFillCaretRight } from "react-icons/ai";
 
 // list belonging to a category from the menu
 const MenuItem = ({ item }) => {
@@ -33,7 +33,9 @@ const MenuItem = ({ item }) => {
 				className="h-[100px] w-[100%]"
 				style={{ objectFit: "cover", overflow: "hidden" }}
 			/>
-			<button className="mr-auto p-2 text-3xl" onClick={() => navigate(-1)}><AiOutlineLeft/></button>
+			<button className="mr-auto p-2 text-3xl" onClick={() => navigate(-1)}>
+				<AiOutlineLeft />
+			</button>
 			<h2 className="text-center text-xl">{item.name}</h2>
 			{/* Render the menu item items */}
 
@@ -58,8 +60,13 @@ const MenuItem = ({ item }) => {
 								</p>
 							</div>
 							<div>
-								<p className="font-bold text-xl text-end">{menuItem.price}</p>
+								<p className="font-bold text-xl text-end">
+									£{parseFloat(menuItem.price).toFixed(2)}
+								</p>
 								<p className="text-sm whitespace-nowrap">{menuItem.cal}</p>
+							</div>
+							<div>
+								<AiFillCaretRight className=" bg-[--c1] rounded my-auto p-[2px] text-xl font-bold border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none" />
 							</div>
 						</div>
 					</li>

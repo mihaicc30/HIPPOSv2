@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { MdRestaurantMenu } from "react-icons/md";
 import { BsLayoutTextWindowReverse, BsBoxArrowRight } from "react-icons/bs";
 import { RiShoppingCartLine } from "react-icons/ri";
-import { FaUserCog } from "react-icons/fa";
+import { MdOutlineSettingsSuggest } from "react-icons/md";
 
 const MobileFooter = ({basketQty}) => {
 	const nav = useNavigate();
@@ -21,7 +21,7 @@ const MobileFooter = ({basketQty}) => {
 	return (
 		<div className="MobileFooter basis-[10%] flex justify-center gap-4 bg-[--c60] py-4 relative max-md:gap-1">
 			<div
-				className={`basis-[18%] transition-all rounded-3xl flex flex-col text-center text-lg justify-center font-semibold ${
+				className={`basis-[18%] transition-all cursor-pointer hover:scale-[0.98] active:scale-[0.90] rounded-3xl flex flex-col text-center text-lg justify-center font-semibold ${
 					activeIndex === "" ? "MAFA" : ""
 				}`}
 				onClick={() => handleDivClick("")}>
@@ -31,7 +31,7 @@ const MobileFooter = ({basketQty}) => {
 				<p className={activeIndex === "" ? "" : "max-sm:hidden"}>Menu</p>
 			</div>
 			<div
-				className={`basis-[18%] transition-all rounded-3xl flex flex-col text-center text-lg justify-center font-semibold ${
+				className={`basis-[18%] transition-all cursor-pointer hover:scale-[0.98] active:scale-[0.90] rounded-3xl flex flex-col text-center text-lg justify-center font-semibold ${
 					activeIndex === "Receipts" ? "MAFA" : ""
 				}`}
 				onClick={() => handleDivClick("Receipts")}>
@@ -43,7 +43,7 @@ const MobileFooter = ({basketQty}) => {
 				</p>
 			</div>
 			<div
-				className={`relative border-2 basis-[18%] transition-all rounded-3xl flex flex-col text-center text-lg justify-center font-semibold ${
+				className={`relative border-2 basis-[18%] transition-all cursor-pointer hover:scale-[0.98] active:scale-[0.90] rounded-3xl flex flex-col text-center text-lg justify-center font-semibold ${
 					activeIndex === "Basket" ? "MAFA" : ""
 				}`}
 				onClick={() => handleDivClick("Basket")}>
@@ -58,19 +58,19 @@ const MobileFooter = ({basketQty}) => {
 				</p>
 			</div>
 			<div
-				className={`basis-[18%] transition-all rounded-3xl flex flex-col text-center text-lg justify-center font-semibold ${
-					activeIndex === "Profile" ? "MAFA" : ""
+				className={`basis-[18%] transition-all cursor-pointer hover:scale-[0.98] active:scale-[0.90] rounded-3xl flex flex-col text-center text-lg justify-center font-semibold ${
+					activeIndex === "Settings" ? "MAFA" : ""
 				}`}
-				onClick={() => handleDivClick("Profile")}>
+				onClick={() => handleDivClick("Settings")}>
 				<span className="mx-auto text-2xl">
-					<FaUserCog />
+					<MdOutlineSettingsSuggest />
 				</span>
-				<p className={activeIndex === "Profile" ? "" : "max-sm:hidden"}>
-					Profile
+				<p className={activeIndex === "Settings" ? "" : "max-sm:hidden"}>
+					Settings
 				</p>
 			</div>
 			<div
-				className={`basis-[18%] transition-all rounded-3xl flex flex-col text-center text-lg justify-center font-semibold ${
+				className={`basis-[18%] transition-all cursor-pointer hover:scale-[0.98] active:scale-[0.90] rounded-3xl flex flex-col text-center text-lg justify-center font-semibold ${
 					activeIndex === "SignOut" ? "MAFA" : ""
 				}`}
 				onClick={() => handleDivClick("SignOut")}>
