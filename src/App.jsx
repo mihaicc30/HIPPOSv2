@@ -52,7 +52,7 @@ const menuitems = [
 			{
 				name: "Avocado on Toast",
 				cal: 350,
-				tag: ["vegetarian", "vegan"],
+				tag: ["vegetarian"],
 				stock: 10,
 				ingredients: [
 					"turmeric sourdough",
@@ -63,7 +63,6 @@ const menuitems = [
 					"pomegranades",
 					"watercress",
 					"poached egg",
-					"crispy bacon",
 					"pine nuts",
 				],
 				price: 9,
@@ -123,11 +122,53 @@ const menuitems = [
 		],
 	},
 	{
-		name: "Kids",
+		name: "Kids Starters",
 		img: "./assets/kids.jpg",
 		items: [
 			{
-				name: "Chicken Nuggets",
+				name: "Kids Mozzarella Sticks",
+				tag: ["vegetarian"],
+				stock: 10,
+				price: 2,
+				allergens: ["nut free"],
+				cal: 300,
+				img: "./assets/mozzarella-sticks.jpg",
+				ingredients: [
+					"Mozzarella cheese sticks",
+					"Breadcrumbs",
+					"Eggs",
+					"Flour",
+					"Marinara sauce",
+				],
+			},
+			{
+				name: "Kids Garlic Bread",
+				tag: ["vegetarian"],
+				stock: 10,
+				price: 2,
+				allergens: ["nut free"],
+				cal: 300,
+				img: "./assets/garlic-bread.jpg",
+				ingredients: ["Baguette", "Garlic", "Butter", "Parsley", "Salt"],
+			},
+			{
+				name: "Kids Onion Rings",
+				tag: ["vegetarian", "vegan"],
+				stock: 10,
+				price: 2,
+				allergens: ["nut free", "dairy free"],
+				cal: 300,
+				img: "./assets/onion-rings.jpg",
+				ingredients: ["Onions", "Flour", "Baking powder", "Salt", "Milk"],
+			},
+		],
+	},
+	{
+		name: "Kids Mains",
+		img: "./assets/kids.jpg",
+		items: [
+			{
+				name: "Kids Chicken Nuggets",
 				cal: 250,
 				tag: [],
 				stock: 10,
@@ -137,7 +178,7 @@ const menuitems = [
 				img: "./assets/kids-nuggets.jpg",
 			},
 			{
-				name: "Cheese Pizza",
+				name: "Kids Cheese Pizza",
 				cal: 350,
 				tag: ["vegetarian"],
 				stock: 10,
@@ -147,7 +188,7 @@ const menuitems = [
 				img: "./assets/kids-cheese-pizza.jpg",
 			},
 			{
-				name: "Grilled Cheese Sandwich",
+				name: "Kids Grilled Cheese Sandwich",
 				cal: 300,
 				tag: ["vegetarian"],
 				stock: 10,
@@ -157,7 +198,7 @@ const menuitems = [
 				img: "./assets/kids-grilled-cheese.jpg",
 			},
 			{
-				name: "Peanut Butter and Jelly Sandwich",
+				name: "Kids Peanut Butter and Jelly Sandwich",
 				cal: 280,
 				tag: ["vegetarian"],
 				stock: 10,
@@ -167,7 +208,7 @@ const menuitems = [
 				img: "./assets/kids-pbj-sandwich.jpg",
 			},
 			{
-				name: "Macaroni and Cheese",
+				name: "Kids Macaroni and Cheese",
 				cal: 450,
 				tag: ["vegetarian"],
 				stock: 10,
@@ -177,7 +218,7 @@ const menuitems = [
 				img: "./assets/kids-mac-and-cheese.jpg",
 			},
 			{
-				name: "Mini Pancakes",
+				name: "Kids Mini Pancakes",
 				cal: 300,
 				tag: ["vegetarian"],
 				stock: 10,
@@ -478,7 +519,17 @@ const menuitems = [
 				tag: [],
 				stock: 10,
 				ingredients: [
-					"pork","lamb","beef","sausage","egg","black pudding","chips","salad","tomato","mushroom","gammon"
+					"pork",
+					"lamb",
+					"beef",
+					"sausage",
+					"egg",
+					"black pudding",
+					"chips",
+					"salad",
+					"tomato",
+					"mushroom",
+					"gammon",
 				],
 				price: 20,
 				allergens: ["nut free"],
@@ -930,8 +981,10 @@ const App = () => {
 
 	// to grab from db later on
 	const [basketItems, setBasketItems] = useState([
-		{ item: "Avocado on Toast", qty: "2" },
-		{ item: "Full Breakfast", qty: "3" },
+		{ item: "Avocado on Toast", qty: 2, course: 1 },
+		{ item: "Full Breakfast", qty: 3, course: 2 },
+		{ item: "Mixed Grill", qty: 3, course: 2 },
+		{ item: "Porridge", qty: 1, course: 3 },
 	]);
 	const [basketQty, setBasketQty] = useState(0);
 
@@ -987,6 +1040,7 @@ const App = () => {
 									path={item.name}
 									element={
 										<MenuItemDetails
+											menuitems={menuitems}
 											item={item}
 											basketItems={basketItems}
 											setBasketItems={setBasketItems}

@@ -53,6 +53,11 @@ const Home = ({
 			setSelectedDietary(event.target.name);
 		};
 
+		const handleItemClick = (c, i) => {
+			// Navigate to the item details route
+			nav(`/${c}/${i}`);
+		};
+
 		return (
 			<div
 				className={`basis-[80%] flex flex-col bg-[--c60] z-10 ${
@@ -76,7 +81,8 @@ const Home = ({
 									onClick={() => setSearchValue("")}
 									className={`absolute top-[28px] right-5 -translate-y-3 ${
 										searchValue ? "" : "hidden"
-									}`}>
+									}
+									`}>
 									✖
 								</button>
 							</div>
@@ -87,7 +93,15 @@ const Home = ({
 							</button>
 							<button
 								onClick={() => setToggleGrid(!toggleGrid)}
-								className="md:hidden whitespace-nowrap bg-[--c1] rounded ml-4 px-3 border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none h-[40px] text-4xl">
+								className={`md:hidden whitespace-nowrap bg-[--c1] rounded ml-4 px-3 border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none h-[40px] text-4xl 
+								${
+									selectedKCal === "clear" &&
+									selectedDietary === "clear" &&
+									searchValue === ""
+										? ""
+										: "hidden"
+								}
+								}`}>
 								{toggleGrid ? <CiGrid41 /> : <CiGrid2H />}
 							</button>
 						</div>
@@ -215,35 +229,103 @@ const Home = ({
 					</div>
 
 					<div
-						className={`relative grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 ${
+						className={`relative ${
 							toggleGrid ? "grid-cols-1" : "grid-cols-2"
-						}`}>
+						} ${
+							selectedKCal === "clear" &&
+							selectedDietary === "clear" &&
+							searchValue === ""
+								? "grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2"
+								: "flex"
+						} `}>
 						<Outlet />
-						{selectedKCal === "clear" && selectedDietary === "clear" && searchValue === ""
-							? menuitems
-									.filter(
-										(item) =>
-											(selectedKCal === "clear" || selectedKCal <= item.cal) &&
-											(selectedDietary === "clear" ||
-												item.allergens.includes(selectedDietary)),
-									)
-									.map((item, index) => (
-										<div
-											key={index}
-											className="p-2 flex flex-col cursor-pointer hover:scale-[0.98] transition-all border-b-2"
-											onClick={() => nav(item.name)}>
-											<img
-												src={item.img}
-												className="h-[100px] w-[100%]"
-												style={{ objectFit: "cover", overflow: "hidden" }}
-											/>
-											<div className="flex justify-between items-center">
-												<p>{item.name}</p>
-												<AiFillCaretRight className="bg-[--c1] rounded p-[2px] text-xl font-bold border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none" />
-											</div>
-										</div>
-									))
-							: ""}
+
+						{selectedKCal === "clear" &&
+						selectedDietary === "clear" &&
+						searchValue === "" ? (
+							menuitems.map((item, index) => (
+								<div
+									key={index}
+									className="p-2 flex flex-col cursor-pointer hover:scale-[0.98] transition-all border-b-2"
+									onClick={() => nav(item.name)}>
+									<img
+										src={item.img}
+										className="h-[100px] w-[100%]"
+										style={{ objectFit: "cover", overflow: "hidden" }}
+									/>
+									<div className="flex justify-between items-center">
+										<p>{item.name}</p>
+										<AiFillCaretRight className="bg-[--c1] rounded p-[2px] text-xl font-bold border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none" />
+									</div>
+								</div>
+							))
+						) : (
+							<ul className="w-[100%]">
+								{menuitems.map((menuItem, index) => {
+									// console.log(menuItem);
+									return menuItem.items
+										.filter(
+											(item) =>
+												(item.name
+													.toLowerCase()
+													.indexOf(searchValue.toLowerCase()) >= 0 ||
+													item.name
+														.toLowerCase()
+														.includes(searchValue.toLowerCase()) ||
+													item.ingredients.some((ingredient) =>
+														ingredient
+															.toLowerCase()
+															.includes(searchValue.toLowerCase()),
+													)) &&
+												(selectedKCal === "clear" ||
+													selectedKCal >= item.cal) &&
+												(selectedDietary === "clear" ||
+													item.allergens.includes(selectedDietary) ||
+													item.tag.includes(selectedDietary)),
+										)
+										.map((menuItem2, index2) => {
+											// console.log(menuItem2);
+											return (
+												<li key={index2}>
+													<div
+														className="flex border-b-2 p-4 active:bg-[--clsec] hover:scale-[0.98] transition gap-4"
+														onClick={() =>
+															handleItemClick(menuItem.name, menuItem2.name)
+														}>
+														<div className="grow">
+															<p className="font-bold text-xl">
+																{menuItem2.name}
+															</p>
+															<p className="text-sm capitalize">
+																{menuItem2.ingredients.map((itemz, index) => (
+																	<span key={index}>
+																		<span>{itemz}</span>
+																		{index !==
+																			menuItem2.ingredients.length - 1 && (
+																			<span>, </span>
+																		)}
+																	</span>
+																))}
+															</p>
+														</div>
+														<div>
+															<p className="font-bold text-xl text-end">
+																£{parseFloat(menuItem2.price).toFixed(2)}
+															</p>
+															<p className="text-sm whitespace-nowrap text-end">
+																{menuItem2.cal} kcal
+															</p>
+														</div>
+														<div>
+															<AiFillCaretRight className=" bg-[--c1] rounded my-auto p-[2px] text-xl font-bold border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none" />
+														</div>
+													</div>
+												</li>
+											);
+										});
+								})}
+							</ul>
+						)}
 					</div>
 				</div>
 			</div>

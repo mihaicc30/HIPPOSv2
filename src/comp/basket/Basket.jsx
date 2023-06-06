@@ -13,15 +13,19 @@ const Basket = ({ menuitems, basketItems, setBasketItems }) => {
 				)
 				.map((item) => ({
 					...item,
+					course: parseInt(
+						basketItems.find((basketItem) => basketItem.item === item.name)
+							.course,
+					),
 					qty: parseInt(
 						basketItems.find((basketItem) => basketItem.item === item.name).qty,
 					),
 				}));
 			return [...items, ...matchedItems];
 		}, []);
-
 		setComputedBasket(matchingItems);
-	}, []);
+		if (basketItems.length > 0) checkIfCoursesNeedRefactoring();
+	}, [basketItems]);
 
 	useEffect(() => {
 		const totalPrice = calculateTotalPrice(computedBasket);
@@ -35,6 +39,39 @@ const Basket = ({ menuitems, basketItems, setBasketItems }) => {
 		);
 		return totalPrice.toFixed(2);
 	};
+
+	const isConsecutive = (arr) => {
+		const sortedArr = arr.sort((a, b) => a - b); // Sort the array in ascending order
+		for (let i = 0; i < sortedArr.length - 1; i++) {
+			if (sortedArr[i] + 1 !== sortedArr[i + 1]) {
+				return false; // Numbers are not consecutive
+			}
+		}
+		return true; // Numbers are consecutive
+	};
+
+	const checkIfCoursesNeedRefactoring = () => {
+		const uniqueCourses = [...new Set(basketItems.map((item) => item.course))];
+		if (!uniqueCourses) return;
+		const areCoursesConsecutive = isConsecutive(uniqueCourses);
+		if (!uniqueCourses.includes(1) || !areCoursesConsecutive) {
+			console.log("they need refactoring");
+			const updatedBasketItems = basketItems.map((item) => {
+				const newCourse =
+					item.course > 1 && !uniqueCourses.includes(item.course - 1)
+						? item.course - 1
+						: item.course;
+				return {
+					...item,
+					course: newCourse > 1 ? newCourse : 1,
+				};
+			});
+			setBasketItems(updatedBasketItems);
+		} else {
+			console.log("they dont need refactoring");
+		}
+	};
+
 	const handleIncrement = (item) => {
 		const updatedBasket = computedBasket.map((basketItem) => {
 			if (basketItem.name === item.name) {
@@ -63,69 +100,170 @@ const Basket = ({ menuitems, basketItems, setBasketItems }) => {
 	};
 
 	const handleDecrement = (item) => {
-		const updatedBasket = computedBasket.map((basketItem) => {
-			if (basketItem.name === item.name && basketItem.qty > 0) {
-				const updatedQty = basketItem.qty - 1;
+		if (item.qty == 1) {
+			const updatedBasket = computedBasket.filter(
+				(basketItem) => basketItem.name !== item.name,
+			);
+			const updatedBasketItems = basketItems.filter(
+				(basketItem) => basketItem.item !== item.name,
+			);
+			setComputedBasket(updatedBasket);
+			setBasketItems(updatedBasketItems);
+		} else {
+			const updatedBasket = computedBasket.map((basketItem) => {
+				if (basketItem.name === item.name && basketItem.qty > 0) {
+					const updatedQty = basketItem.qty - 1;
+					return {
+						...basketItem,
+						qty: updatedQty,
+					};
+				}
+				return basketItem;
+			});
+
+			const updatedBasketItems = basketItems.map((basketItem) => {
+				if (basketItem.item === item.name && parseInt(basketItem.qty) > 0) {
+					const updatedQty = parseInt(basketItem.qty) - 1;
+					return {
+						...basketItem,
+						qty: updatedQty.toString(),
+					};
+				}
+				return basketItem;
+			});
+
+			setComputedBasket(updatedBasket);
+			setBasketItems(updatedBasketItems);
+		}
+	};
+
+	const getUniqueCourses = () => {
+		const uniqueCourses = basketItems.reduce((courses, item) => {
+			if (!courses.includes(item.course)) {
+				courses.push(item.course);
+			}
+			return courses;
+		}, []);
+
+		return uniqueCourses.sort((a, b) => a - b);
+	};
+
+	const handleCourseChange = (itemz, e) => {
+		console.log(itemz, e);
+		const updatedBasketItems = basketItems.map((item) => {
+			if (item.item === itemz) {
+				console.log("🚀 ~ file: Basket.jsx:154 ~ updatedBasketItems ~ item:", item)
 				return {
-					...basketItem,
-					qty: updatedQty,
+					...item,
+					course: parseInt(e),
 				};
 			}
-			return basketItem;
+			return item;
 		});
+		console.log("🚀 ~ file: Basket.jsx:163 ~ updatedBasketItems ~ updatedBasketItems:", updatedBasketItems)
+		// const updatedBasketItems2 = computedBasket.map((item) => {
+		// 	if (item.item === itemz) {
+		// 		return {
+		// 			...item,
+		// 			course: e,
+		// 		};
+		// 	}
+		// 	return item;
+		// });
 
-		const updatedBasketItems = basketItems.map((basketItem) => {
-			if (basketItem.item === item.name && parseInt(basketItem.qty) > 0) {
-				const updatedQty = parseInt(basketItem.qty) - 1;
-				return {
-					...basketItem,
-					qty: updatedQty.toString(),
-				};
-			}
-			return basketItem;
-		});
+		// setComputedBasket(updatedBasketItems2);
 
-		setComputedBasket(updatedBasket);
 		setBasketItems(updatedBasketItems);
 	};
 
 	return (
 		<div className="basis-[80%] bg-[--c60] z-10 overflow-y-scroll flex flex-col">
+			{console.log(getUniqueCourses())}
 			<div className="flex flex-col text-center my-4 pb-4 border-b-2 text-xl">
 				<p>The White Lion</p>
 				<p>Table: 6</p>
 			</div>
-
+			{console.log("computedBasket",computedBasket)}
 			<div className="products flex flex-col gap-4 px-4 my-4 grow overflow-auto">
-				{computedBasket.map((item) => {
-					// console.log(item);
+				{getUniqueCourses().map((course) => {
+					// console.log(computedBasket);
 					return (
-						<div key={item.name} className="product flex gap-4 pb-4 border-b-2">
-							{/* <img src={item.img} alt={item.name} /> */}
-							<div className="grow flex flex-col justify-start">
-								<p className="font-bold text-xl line-clamp-1">{item.name}</p>
-								<span className="text-xs font-normal">{item.cal} kcal</span>
-								<div className="flex gap-4 justify-start text-3xl items-center">
-									<button
-										className="px-3 py-1 rounded-full border-2"
-										onClick={() => handleDecrement(item)}>
-										-
-									</button>
-									<span className="quantity">{item.qty}</span>
-									<button
-										className="px-3 py-1 rounded-full border-2"
-										onClick={() => handleIncrement(item)}>
-										+
-									</button>
-								</div>
-							</div>
-
-							<div>
-								<p className="text-xl text-end ">Total:</p>
-								<p className="font-bold text-xl text-end">
-									£{(parseFloat(item.price) * parseFloat(item.qty)).toFixed(2)}
-								</p>
-							</div>
+						<div key={crypto.randomUUID()}>
+							<p className="border-b-8">
+								Course {course}{" "}
+								{course < 2 && getUniqueCourses().length > 1
+									? "(first to serve)"
+									: ""}{" "}
+							</p>
+							{computedBasket
+								.filter((item) => item.course === course)
+								.map((item) => (
+									<div
+										key={crypto.randomUUID()}
+										className="product flex gap-4 pb-4 border-b-2">
+										{/* <img src={item.img} alt={item.name} /> */}
+										<div className="grow flex flex-col justify-start">
+											<p className="font-bold text-xl line-clamp-1">
+												{item.name}
+											</p>
+											<div>
+												<label htmlFor="courseNumber">Course </label>
+												<select
+													className="appearance-none bg-[--c1] rounded px-3 text-center font-bold border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none"
+													name="courseNumber"
+													defaultValue={item.course}
+													onChange={(event) =>
+														handleCourseChange(item.name, event.target.value)
+													}>
+													{getUniqueCourses().map((course, index) => (
+														<option
+															className="text-center"
+															value={course}
+															key={crypto.randomUUID()}>
+															{course}
+														</option>
+													))}
+													<option
+														className="text-center"
+														value={
+															getUniqueCourses()[
+																getUniqueCourses().length - 1
+															] + 1
+														}
+														key={crypto.randomUUID()}>
+														{getUniqueCourses()[getUniqueCourses().length - 1] +
+															1}
+													</option>
+												</select>
+											</div>
+											<span className="text-xs font-normal">
+												{item.cal} kcal
+											</span>
+											<div className="flex gap-2 justify-start text-md items-center">
+												<button
+													className="px-3 py-1 rounded-full border-2"
+													onClick={() => handleDecrement(item)}>
+													-
+												</button>
+												<span className="quantity">{item.qty}</span>
+												<button
+													className="px-3 py-1 rounded-full border-2"
+													onClick={() => handleIncrement(item)}>
+													+
+												</button>
+											</div>
+										</div>
+										<div>
+											<p className="text-xl text-end">Total:</p>
+											<p className="font-bold text-xl text-end">
+												£
+												{(
+													parseFloat(item.price) * parseFloat(item.qty)
+												).toFixed(2)}
+											</p>
+										</div>
+									</div>
+								))}
 						</div>
 					);
 				})}
@@ -135,7 +273,7 @@ const Basket = ({ menuitems, basketItems, setBasketItems }) => {
 				TOTAL £{totalPrice}
 			</p>
 			<button
-				disabled={parseFloat(totalPrice) <= 0 ? true : false}
+				disabled={parseFloat(totalPrice) <= 0}
 				className="bg-[--c1] rounded px-3 text-center py-3 my-4 mx-4 font-bold border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none">
 				Payment
 			</button>

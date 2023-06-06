@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AiOutlineLeft } from "react-icons/ai";
 
-const MenuItemDetails = ({ item, basketItems, setBasketItems }) => {
+const MenuItemDetails = ({ item, basketItems, setBasketItems, menuitems }) => {
+	console.log(
+		"🚀 ~ file: MenuItemDetails.jsx:6 ~ MenuItemDetails ~ menuitems:",
+		menuitems,
+	);
 	const navigate = useNavigate();
 	const [quantity, setQuantity] = useState(1);
 
@@ -16,10 +20,30 @@ const MenuItemDetails = ({ item, basketItems, setBasketItems }) => {
 		setQuantity(quantity + 1);
 	};
 
+	const findItemCategory = (item) => {
+		for (const category of menuitems) {
+			const foundItem = category.items.find(
+				(menuItem) => menuItem.name === item,
+			);
+			if (foundItem) {
+				console.log(category.name);
+				if(category.name === "Breakfast") return 2
+				if(category.name === "Starters") return 1
+				if(category.name === "Mains") return 2
+				if(category.name === "Desserts") return 3
+				if(category.name === "Drinks") return 0
+				if(category.name === "Kids Starters") return 1
+				if(category.name === "Kids Mains") return 2
+			}
+		}
+		return null; // or handle the case when item is not found
+	};
+
 	const addToBasket = () => {
 		const existingItem = basketItems.find(
 			(basketItem) => basketItem.item === item.name,
 		);
+
 		if (existingItem) {
 			const updatedBasket = basketItems.map((basketItem) => {
 				if (basketItem.item === item.name) {
@@ -32,9 +56,10 @@ const MenuItemDetails = ({ item, basketItems, setBasketItems }) => {
 			});
 			setBasketItems(updatedBasket);
 		} else {
+			findItemCategory(item.name)
 			const updatedBasket = [
 				...basketItems,
-				{ item: item.name, qty: String(quantity) },
+				{ item: item.name, qty: String(quantity), course: findItemCategory(item.name) },
 			];
 			setBasketItems(updatedBasket);
 		}
