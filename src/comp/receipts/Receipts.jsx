@@ -16,16 +16,20 @@ const Receipts = ({ receipts }) => {
 		<div className="basis-[80%] bg-[--c60] z-10 overflow-y-scroll px-2">
 			{getUniqueYears().map((year) => (
 				<details className="pl-1" key={year}>
-					<summary>{year}</summary>
+					<summary className="py-2 border-b-2 bg-[--c12]">{year}</summary>
 					{getUniqueMonths().map((month) => (
-						<details className="pl-3" key={month}>
+						<details className="pl-1 bg-[#f5b06f3d]" key={month}>
 							<summary>{month}</summary>
 							{receipts.map((receipt, index) => {
 								if (receipt.year === year && receipt.month === month) {
 									return (
-										<div key={index} className="receipt border-t-2 border-b-2 my-4 text-sm bg-[--c30] py-2">
+										<div
+											key={index}
+											className="receipt border-t-2 border-b-2 my-4 text-sm bg-[--c30] py-2">
 											<details className="pl-5">
-												<summary>Receipt Number: {receipt.receiptNumber}</summary>
+												<summary>
+													Receipt Number: {receipt.receiptNumber}
+												</summary>
 												<div>
 													<p className="font-bold">Venue: {receipt.pubName}</p>
 													<p>Address: {receipt.address}</p>

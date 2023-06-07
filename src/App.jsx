@@ -9,10 +9,18 @@ import Home from "./comp/home/Home";
 import Auth from "./comp/isAuth/Auth";
 import Layout from "./comp/isAuth/Layout";
 import Receipts from "./comp/Receipts/Receipts";
-import Settings from "./comp/Settings/Settings";
 import Signout from "./comp/signout/Signout";
 import Basket from "./comp/basket/Basket";
 import Page404 from "./comp/Page404";
+
+import Settings from "./comp/Settings/Settings";
+import Contact from "./comp/Settings/Contact";
+import FAQ from "./comp/Settings/Faq";
+import Notifications from "./comp/Settings/Notifications";
+import News from "./comp/Settings/News";
+import Privacy from "./comp/Settings/Privacy";
+import Symbol from "./comp/Settings/Symbol";
+import TC from "./comp/Settings/T&C";
 
 // to grab from db later on
 const menuitems = [
@@ -870,7 +878,7 @@ const App = () => {
 			address: "123 Dove Close, Worcester",
 			phone: "+447443350891",
 			website: "www.theMightyLionWebsite.com",
-			receiptNumber: "SomeCounter",
+			receiptNumber: crypto.randomUUID(),
 			dateTime: "2023-06-04 14:30:00",
 			year: "2023",
 			month: "06",
@@ -898,7 +906,7 @@ const App = () => {
 			address: "123 Dove Close, Worcester",
 			phone: "+447443350891",
 			website: "www.theMightyLionWebsite.com",
-			receiptNumber: "SomeCounter",
+			receiptNumber: crypto.randomUUID(),
 			dateTime: "2023-06-04 11:30:00",
 			year: "2023",
 			month: "06",
@@ -926,7 +934,7 @@ const App = () => {
 			address: "123 Dove Close, Worcester",
 			phone: "+447443350891",
 			website: "www.theMightyLionWebsite.com",
-			receiptNumber: "SomeCounter",
+			receiptNumber: crypto.randomUUID(),
 			dateTime: "2023-03-04 14:30:00",
 			year: "2023",
 			month: "03",
@@ -954,7 +962,7 @@ const App = () => {
 			address: "123 Dove Close, Worcester",
 			phone: "+447443350891",
 			website: "www.theMightyLionWebsite.com",
-			receiptNumber: "SomeCounter",
+			receiptNumber: crypto.randomUUID(),
 			dateTime: "2022-06-04 14:30:00",
 			year: "2022",
 			month: "06",
@@ -985,6 +993,7 @@ const App = () => {
 		{ item: "Full Breakfast", qty: 3, course: 2 },
 		{ item: "Mixed Grill", qty: 3, course: 2 },
 		{ item: "Porridge", qty: 1, course: 3 },
+		{ item: "Lemonade", qty: 1, course: 0 },
 	]);
 	const [basketQty, setBasketQty] = useState(0);
 
@@ -1067,6 +1076,18 @@ const App = () => {
 					}
 				/>
 				<Route path="/Settings" element={<Settings user={user} />} />
+
+				<Route path="/Contact" element={<Contact user={user} />} />
+				<Route path="/FAQ" element={<FAQ user={user} />} />
+				<Route path="/Notifications" element={<Notifications user={user} />} />
+				<Route path="/News" element={<News user={user} />} />
+				<Route path="/Privacy" element={<Privacy user={user} />} />
+				<Route path="/Symbol" element={<Symbol user={user} />} />
+				<Route path="/T&C" element={<TC user={user} />} />
+
+
+
+
 				<Route
 					path="/Signout"
 					element={<Signout user={user} setUser={setUser} />}

@@ -3,10 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { AiOutlineLeft } from "react-icons/ai";
 
 const MenuItemDetails = ({ item, basketItems, setBasketItems, menuitems }) => {
-	console.log(
-		"🚀 ~ file: MenuItemDetails.jsx:6 ~ MenuItemDetails ~ menuitems:",
-		menuitems,
-	);
 	const navigate = useNavigate();
 	const [quantity, setQuantity] = useState(1);
 
@@ -26,14 +22,13 @@ const MenuItemDetails = ({ item, basketItems, setBasketItems, menuitems }) => {
 				(menuItem) => menuItem.name === item,
 			);
 			if (foundItem) {
-				console.log(category.name);
-				if(category.name === "Breakfast") return 2
-				if(category.name === "Starters") return 1
-				if(category.name === "Mains") return 2
-				if(category.name === "Desserts") return 3
-				if(category.name === "Drinks") return 0
-				if(category.name === "Kids Starters") return 1
-				if(category.name === "Kids Mains") return 2
+				if (category.name === "Breakfast") return 2;
+				if (category.name === "Starters") return 1;
+				if (category.name === "Mains") return 2;
+				if (category.name === "Desserts") return 3;
+				if (category.name === "Drinks") return 0;
+				if (category.name === "Kids Starters") return 1;
+				if (category.name === "Kids Mains") return 2;
 			}
 		}
 		return null; // or handle the case when item is not found
@@ -56,10 +51,14 @@ const MenuItemDetails = ({ item, basketItems, setBasketItems, menuitems }) => {
 			});
 			setBasketItems(updatedBasket);
 		} else {
-			findItemCategory(item.name)
+			findItemCategory(item.name);
 			const updatedBasket = [
 				...basketItems,
-				{ item: item.name, qty: String(quantity), course: findItemCategory(item.name) },
+				{
+					item: item.name,
+					qty: String(quantity),
+					course: findItemCategory(item.name),
+				},
 			];
 			setBasketItems(updatedBasket);
 		}
@@ -90,7 +89,7 @@ const MenuItemDetails = ({ item, basketItems, setBasketItems, menuitems }) => {
 						item.tag.map((item, index) => <span key={index}>{item}</span>)}
 				</div>
 
-				<button className="bg-[--c1] rounded mt-4 px-3 py-1 font-bold border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none max-w-[500px]">
+				<button className="bg-[--c1] rounded mt-4 mx-auto px-6 py-1 font-bold border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none max-w-[500px]">
 					Allergen Info
 				</button>
 			</div>
