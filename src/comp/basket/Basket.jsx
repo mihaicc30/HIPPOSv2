@@ -52,23 +52,26 @@ const Basket = ({ menuitems, basketItems, setBasketItems }) => {
 
 	const checkIfCoursesNeedRefactoring = () => {
 		const uniqueCourses = [...new Set(basketItems.map((item) => item.course))];
+		console.log("🚀 ~ file: Basket.jsx:55 ~ checkIfCoursesNeedRefactoring ~ uniqueCourses:", uniqueCourses)
 		if (!uniqueCourses) return;
 		const areCoursesConsecutive = isConsecutive(uniqueCourses);
 		if (!uniqueCourses.includes(1) || !areCoursesConsecutive) {
-			console.log("they need refactoring");
+			console.log("Basket needs refactoring.");
 			const updatedBasketItems = basketItems.map((item) => {
+				console.log(item, item.course);
 				const newCourse =
-					item.course > 1 && !uniqueCourses.includes(item.course - 1)
+					item.course > 1 && !uniqueCourses.includes(item.course - 1) 
 						? item.course - 1
 						: item.course;
 				return {
 					...item,
-					course: newCourse > 1 ? newCourse : 1,
+					// course: newCourse > 1 ? newCourse : 1,
+					course: newCourse > 1 ? newCourse : item.course == 0 ? 0 : 1
 				};
 			});
 			setBasketItems(updatedBasketItems);
 		} else {
-			console.log("they dont need refactoring");
+			console.log("Basket does not need refactoring.");
 		}
 	};
 
@@ -152,7 +155,10 @@ const Basket = ({ menuitems, basketItems, setBasketItems }) => {
 		console.log(itemz, e);
 		const updatedBasketItems = basketItems.map((item) => {
 			if (item.item === itemz) {
-				console.log("🚀 ~ file: Basket.jsx:154 ~ updatedBasketItems ~ item:", item)
+				console.log(
+					"🚀 ~ file: Basket.jsx:154 ~ updatedBasketItems ~ item:",
+					item,
+				);
 				return {
 					...item,
 					course: parseInt(e),
@@ -160,112 +166,152 @@ const Basket = ({ menuitems, basketItems, setBasketItems }) => {
 			}
 			return item;
 		});
-		console.log("🚀 ~ file: Basket.jsx:163 ~ updatedBasketItems ~ updatedBasketItems:", updatedBasketItems)
-		// const updatedBasketItems2 = computedBasket.map((item) => {
-		// 	if (item.item === itemz) {
-		// 		return {
-		// 			...item,
-		// 			course: e,
-		// 		};
-		// 	}
-		// 	return item;
-		// });
-
-		// setComputedBasket(updatedBasketItems2);
+		console.log(
+			"🚀 ~ file: Basket.jsx:163 ~ updatedBasketItems ~ updatedBasketItems:",
+			updatedBasketItems,
+		);
 
 		setBasketItems(updatedBasketItems);
 	};
 
 	return (
 		<div className="basis-[80%] bg-[--c60] z-10 overflow-y-scroll flex flex-col">
-			{console.log(getUniqueCourses())}
 			<div className="flex flex-col text-center my-4 pb-4 border-b-2 text-xl">
 				<p>The White Lion</p>
 				<p>Table: 6</p>
 			</div>
-			{console.log("computedBasket",computedBasket)}
-			<div className="products flex flex-col gap-4 px-4 my-4 grow overflow-auto">
+			<div className="products flex flex-col gap-4 px-4 my-4  overflow-auto">
+				{getUniqueCourses().includes(0) && <p className="border-b-8">Drinks</p>}
+				{computedBasket.map((item, index) => {
+					if (item.course === 0) {
+						return (
+							<div
+								key={crypto.randomUUID()}
+								className="product flex gap-2 pb-2 border-b-2">
+								{/* <img src={item.img} alt={item.name} /> */}
+								<div
+									className="grow flex flex-col justify-start"
+									key={crypto.randomUUID()}>
+									<p className="font-bold text-xl line-clamp-1">{item.name}</p>
+
+									<div className="flex gap-2 justify-start text-md items-center">
+										<button
+											className="px-3 py-1 rounded-full border-2"
+											onClick={() => handleDecrement(item)}>
+											-
+										</button>
+										<span className="quantity">{item.qty}</span>
+										<button
+											className="px-3 py-1 rounded-full border-2"
+											onClick={() => handleIncrement(item)}>
+											+
+										</button>
+									</div>
+								</div>
+								<div key={crypto.randomUUID()}>
+									<p className="text-xl text-end">Total:</p>
+									<p className="font-bold text-xl text-end">
+										£
+										{(parseFloat(item.price) * parseFloat(item.qty)).toFixed(2)}
+									</p>
+								</div>
+							</div>
+						);
+					}
+					return null; // or handle the case when the condition is not met
+				})}
 				{getUniqueCourses().map((course) => {
 					// console.log(computedBasket);
-					return (
-						<div key={crypto.randomUUID()}>
-							<p className="border-b-8">
-								Course {course}{" "}
-								{course < 2 && getUniqueCourses().length > 1
-									? "(first to serve)"
-									: ""}{" "}
-							</p>
-							{computedBasket
-								.filter((item) => item.course === course)
-								.map((item) => (
-									<div
-										key={crypto.randomUUID()}
-										className="product flex gap-4 pb-4 border-b-2">
-										{/* <img src={item.img} alt={item.name} /> */}
-										<div className="grow flex flex-col justify-start">
-											<p className="font-bold text-xl line-clamp-1">
-												{item.name}
-											</p>
-											<div>
-												<label htmlFor="courseNumber">Course </label>
-												<select
-													className="appearance-none bg-[--c1] rounded px-3 text-center font-bold border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none"
-													name="courseNumber"
-													defaultValue={item.course}
-													onChange={(event) =>
-														handleCourseChange(item.name, event.target.value)
-													}>
-													{getUniqueCourses().map((course, index) => (
-														<option
-															className="text-center"
-															value={course}
-															key={crypto.randomUUID()}>
-															{course}
-														</option>
-													))}
-													<option
-														className="text-center"
-														value={
-															getUniqueCourses()[
-																getUniqueCourses().length - 1
-															] + 1
-														}
-														key={crypto.randomUUID()}>
-														{getUniqueCourses()[getUniqueCourses().length - 1] +
-															1}
-													</option>
-												</select>
-											</div>
-											<span className="text-xs font-normal">
-												{item.cal} kcal
-											</span>
-											<div className="flex gap-2 justify-start text-md items-center">
-												<button
-													className="px-3 py-1 rounded-full border-2"
-													onClick={() => handleDecrement(item)}>
-													-
-												</button>
-												<span className="quantity">{item.qty}</span>
-												<button
-													className="px-3 py-1 rounded-full border-2"
-													onClick={() => handleIncrement(item)}>
-													+
-												</button>
-											</div>
-										</div>
-										<div>
-											<p className="text-xl text-end">Total:</p>
-											<p className="font-bold text-xl text-end">
-												£
-												{(
-													parseFloat(item.price) * parseFloat(item.qty)
-												).toFixed(2)}
-											</p>
-										</div>
-									</div>
-								))}
-						</div>
-					);
+					if (course !== 0)
+						return (
+							<div key={crypto.randomUUID()}>
+								<p className="border-b-8">
+									Course {course}
+									{course > 0 && course < 2 && getUniqueCourses().length > 1
+										? "(first to serve)"
+										: ""}
+								</p>
+								{computedBasket
+									.filter((item) => item.course === course)
+									.map((item) => {
+										if (item.course > 0)
+											return (
+												<div
+													key={crypto.randomUUID()}
+													className="product flex gap-2 pb-2 border-b-2">
+													{/* <img src={item.img} alt={item.name} /> */}
+													<div className="grow flex flex-col justify-start">
+														<p className="font-bold text-xl line-clamp-1">
+															{item.name}
+														</p>
+														<div>
+															<span>Course </span>
+															<select
+																className="appearance-none bg-[--c1] rounded px-3 text-center font-bold border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none"
+																name="courseNumber"
+																defaultValue={item.course}
+																onChange={(event) =>
+																	handleCourseChange(
+																		item.name,
+																		event.target.value,
+																	)
+																}>
+																{getUniqueCourses().map((course, index) => {
+																	if (course !== 0)
+																		return (
+																			<option
+																				className="text-center"
+																				value={course}
+																				key={crypto.randomUUID()}>
+																				{course}
+																			</option>
+																		);
+																})}
+																<option
+																	className="text-center"
+																	value={
+																		getUniqueCourses()[
+																			getUniqueCourses().length - 1
+																		] + 1
+																	}
+																	key={crypto.randomUUID()}>
+																	{getUniqueCourses()[
+																		getUniqueCourses().length - 1
+																	] + 1}
+																</option>
+															</select>
+														</div>
+														<span className="text-xs font-normal">
+															{item.cal} kcal
+														</span>
+														<div className="flex gap-2 justify-start text-md items-center">
+															<button
+																className="px-3 py-1 rounded-full border-2"
+																onClick={() => handleDecrement(item)}>
+																-
+															</button>
+															<span className="quantity">{item.qty}</span>
+															<button
+																className="px-3 py-1 rounded-full border-2"
+																onClick={() => handleIncrement(item)}>
+																+
+															</button>
+														</div>
+													</div>
+													<div>
+														<p className="text-xl text-end">Total:</p>
+														<p className="font-bold text-xl text-end">
+															£
+															{(
+																parseFloat(item.price) * parseFloat(item.qty)
+															).toFixed(2)}
+														</p>
+													</div>
+												</div>
+											);
+									})}
+							</div>
+						);
 				})}
 			</div>
 
