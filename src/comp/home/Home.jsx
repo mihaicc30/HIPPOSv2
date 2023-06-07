@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./Home.css";
 import Auth from "../isAuth/Auth";
+import VenueNTable from "./VenueNTable";
 
 import { AiFillCaretRight, AiOutlineLeft } from "react-icons/ai";
 import { BsFilterRight } from "react-icons/bs";
@@ -30,6 +31,9 @@ const Home = ({
 	setSelectedKCal,
 	selectedDietary,
 	setSelectedDietary,
+	venues,
+	venueNtable,
+	setVenueNtable,
 }) => {
 	useEffect(() => {}, [user]);
 
@@ -57,6 +61,14 @@ const Home = ({
 			// Navigate to the item details route
 			nav(`/${c}/${i}`);
 		};
+		if (!venueNtable.venue || !venueNtable.table)
+			return (
+				<VenueNTable
+					venues={venues}
+					venueNtable={venueNtable}
+					setVenueNtable={setVenueNtable}
+				/>
+			);
 
 		return (
 			<div
@@ -70,7 +82,7 @@ const Home = ({
 								<input
 									type="text"
 									placeholder="Search..."
-									className="w-[98%] mx-auto pl-10 pr-10 py-2 my-2"
+									className="w-[98%] mx-auto pl-10 pr-10 py-2 my-2 rounded"
 									value={searchValue}
 									onChange={handleInputChange}
 								/>

@@ -22,6 +22,111 @@ import Privacy from "./comp/Settings/Privacy";
 import Symbol from "./comp/Settings/Symbol";
 import TC from "./comp/Settings/T&C";
 
+import {getVenueById} from "./utils/BasketUtils"
+
+const venues = [
+	{
+	  id: 1,
+	  name: "The White Lion",
+	  address: "Unit 6, C, Gregory's Mill St, Worcester WR3 8BA",
+	  phone: "12345 1234 123",
+	  website: "theawesomelionwebsite.co.uk",
+	  img: "./assets/defaultVenue.jpg",
+	  table: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+	  coords: [{ long: "52.191724" }, { lat: "-2.220120" }],
+	},
+	{
+	  id: 2,
+	  name: "The Red Lion",
+	  address: "Unit 1B, Battery Retail Park, Selly Oak, Birmingham B29 6SJ",
+	  phone: "12345 1234 123",
+	  website: "theawesomelionwebsite.co.uk",
+	  img: "./assets/defaultVenue.jpg",
+	  table: [1, 2, 3, 4, 5, 6, 7],
+	  coords: [{ long: "52.171724" }, { lat: "-2.210120" }],
+	},
+	{
+	  id: 3,
+	  name: "The Black Lion",
+	  address: "Brompton House, Station Rd, Broadway WR12 7DE",
+	  phone: "12345 1234 123",
+	  website: "theawesomelionwebsite.co.uk",
+	  img: "./assets/defaultVenue.jpg",
+	  table: [15, 16, 17, 18, 19, 20],
+	  coords: [{ long: "52.161724" }, { lat: "-2.200120" }],
+	},
+	{
+	  id: 4,
+	  name: "The Old Lion Big Name Venue",
+	  address: "Matson Ln, Matson, Gloucester GL4 6EA",
+	  phone: "12345 1234 123",
+	  website: "theawesomelionwebsite.co.uk",
+	  img: "./assets/defaultVenue.jpg",
+	  table: [1, 2, 3, 4, 5, 18, 19, 20],
+	  coords: [{ long: "52.151724" }, { lat: "-2.230120" }],
+	},
+	{
+	  id: 5,
+	  name: "The Blue Lion",
+	  address: "123 Blue Street, Blueville, BL12 3BL",
+	  phone: "12345 1234 123",
+	  website: "thebluelionwebsite.co.uk",
+	  img: "./assets/defaultVenue.jpg",
+	  table: [1, 2, 3],
+	  coords: [{ long: "51.234567" }, { lat: "-1.234567" }],
+	},
+	{
+	  id: 6,
+	  name: "The Green Lion",
+	  address: "456 Green Road, Greenvale, GR34 5GR",
+	  phone: "12345 1234 123",
+	  website: "thegreenlionwebsite.co.uk",
+	  img: "./assets/defaultVenue.jpg",
+	  table: [4, 5, 6],
+	  coords: [{ long: "51.345678" }, { lat: "-1.345678" }],
+	},
+	{
+	  id: 7,
+	  name: "The Yellow Lion",
+	  address: "789 Yellow Avenue, Yellowtown, YL56 7YL",
+	  phone: "12345 1234 123",
+	  website: "theyellowlionwebsite.co.uk",
+	  img: "./assets/defaultVenue.jpg",
+	  table: [7, 8, 9],
+	  coords: [{ long: "51.456789" }, { lat: "-1.456789" }],
+	},
+	{
+	  id: 8,
+	  name: "The Purple Lion",
+	  address: "987 Purple Close, Purpletown, PT98 7PT",
+	  phone: "12345 1234 123",
+	  website: "thepurplelionwebsite.co.uk",
+	  img: "./assets/defaultVenue.jpg",
+	  table: [10, 11, 12],
+	  coords: [{ long: "51.567890" }, { lat: "-1.567890" }],
+	},
+	{
+	  id: 9,
+	  name: "The Orange Lion",
+	  address: "654 Orange Lane, Orangecity, OC65 4OC",
+	  phone: "12345 1234 123",
+	  website: "theorangelionwebsite.co.uk",
+	  img: "./assets/defaultVenue.jpg",
+	  table: [13, 14, 15],
+	  coords: [{ long: "51.678901" }, { lat: "-1.678901" }],
+	},
+	{
+	  id: 10,
+	  name: "The Pink Lion",
+	  address: "321 Pink Crescent, Pinkville, PK32 1PK",
+	  phone: "12345 1234 123",
+	  website: "thepinklionwebsite.co.uk",
+	  img: "./assets/defaultVenue.jpg",
+	  table: [16, 17, 18],
+	  coords: [{ long: "51.789012" }, { lat: "-1.789012" }],
+	},
+  ];
+  
 // to grab from db later on
 const menuitems = [
 	{
@@ -45,7 +150,7 @@ const menuitems = [
 				],
 				price: 10,
 				allergens: ["nut free"],
-				img: "./assets/img-8lpKdg0FuYdFH4bJ5jvgH.jpeg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Porridge",
@@ -55,7 +160,7 @@ const menuitems = [
 				ingredients: ["scottish oats", "milk", "honey", "wallnuts", "bannana"],
 				price: 6,
 				allergens: ["nut free", "gluten free"],
-				img: "./assets/img-8lpKdg0FuYdFH4bJ5jvgH.jpeg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Avocado on Toast",
@@ -75,7 +180,7 @@ const menuitems = [
 				],
 				price: 9,
 				allergens: [],
-				img: "./assets/breakfast-avocado-toast.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Scrambled Eggs",
@@ -85,7 +190,7 @@ const menuitems = [
 				ingredients: ["eggs", "salt", "pepper", "butter"],
 				price: 8,
 				allergens: ["nut free", "gluten free"],
-				img: "./assets/breakfast-scrambled-eggs.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "French Toast",
@@ -95,7 +200,7 @@ const menuitems = [
 				ingredients: ["bread", "eggs", "milk", "cinnamon", "sugar"],
 				price: 7,
 				allergens: ["nut free"],
-				img: "./assets/breakfast-french-toast.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Yogurt Parfait",
@@ -105,7 +210,7 @@ const menuitems = [
 				ingredients: ["yogurt", "granola", "mixed berries", "honey"],
 				price: 6,
 				allergens: ["nut free", "gluten free"],
-				img: "./assets/breakfast-yogurt-parfait.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Protein Pancakes",
@@ -115,7 +220,7 @@ const menuitems = [
 				ingredients: ["oats", "protein powder", "banana", "eggs", "milk"],
 				price: 10,
 				allergens: ["nut free"],
-				img: "./assets/breakfast-protein-pancakes.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Veggie Omelette",
@@ -125,7 +230,7 @@ const menuitems = [
 				ingredients: ["eggs", "bell peppers", "onions", "spinach", "cheese"],
 				price: 8,
 				allergens: ["nut free", "gluten free"],
-				img: "./assets/breakfast-veggie-omelette.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 		],
 	},
@@ -140,7 +245,7 @@ const menuitems = [
 				price: 2,
 				allergens: ["nut free"],
 				cal: 300,
-				img: "./assets/mozzarella-sticks.jpg",
+				img: "./assets/defaultDish.jpg",
 				ingredients: [
 					"Mozzarella cheese sticks",
 					"Breadcrumbs",
@@ -156,7 +261,7 @@ const menuitems = [
 				price: 2,
 				allergens: ["nut free"],
 				cal: 300,
-				img: "./assets/garlic-bread.jpg",
+				img: "./assets/defaultDish.jpg",
 				ingredients: ["Baguette", "Garlic", "Butter", "Parsley", "Salt"],
 			},
 			{
@@ -166,7 +271,7 @@ const menuitems = [
 				price: 2,
 				allergens: ["nut free", "dairy free"],
 				cal: 300,
-				img: "./assets/onion-rings.jpg",
+				img: "./assets/defaultDish.jpg",
 				ingredients: ["Onions", "Flour", "Baking powder", "Salt", "Milk"],
 			},
 		],
@@ -183,7 +288,7 @@ const menuitems = [
 				ingredients: ["chicken breast", "breadcrumbs", "spices"],
 				price: 5,
 				allergens: ["nut free", "gluten free", "dairy free"],
-				img: "./assets/kids-nuggets.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Kids Cheese Pizza",
@@ -193,7 +298,7 @@ const menuitems = [
 				ingredients: ["pizza dough", "tomato sauce", "mozzarella cheese"],
 				price: 7,
 				allergens: ["nut free"],
-				img: "./assets/kids-cheese-pizza.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Kids Grilled Cheese Sandwich",
@@ -203,7 +308,7 @@ const menuitems = [
 				ingredients: ["cheddar", "cheese", "bread", "butter"],
 				price: 4,
 				allergens: ["nut free"],
-				img: "./assets/kids-grilled-cheese.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Kids Peanut Butter and Jelly Sandwich",
@@ -213,7 +318,7 @@ const menuitems = [
 				ingredients: ["peanut butter", "jelly", "bread"],
 				price: 3,
 				allergens: [],
-				img: "./assets/kids-pbj-sandwich.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Kids Macaroni and Cheese",
@@ -223,7 +328,7 @@ const menuitems = [
 				ingredients: ["macaroni pasta", "cheddar cheese", "milk"],
 				price: 7,
 				allergens: ["nut free"],
-				img: "./assets/kids-mac-and-cheese.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Kids Mini Pancakes",
@@ -233,7 +338,7 @@ const menuitems = [
 				ingredients: ["pancake batter", "maple syrup", "fruits"],
 				price: 6,
 				allergens: ["nut free"],
-				img: "./assets/kids-mini-pancakes.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 		],
 	},
@@ -247,7 +352,7 @@ const menuitems = [
 				stock: 10,
 				price: 2,
 				allergens: [],
-				img: "./assets/coca-cola.jpg",
+				img: "./assets/defaultDrink.jpg",
 				calories: "140",
 				ingredients: [
 					"Carbonated water",
@@ -264,7 +369,7 @@ const menuitems = [
 				stock: 10,
 				price: 3,
 				allergens: [],
-				img: "./assets/orange-juice.jpg",
+				img: "./assets/defaultDrink.jpg",
 				calories: "110",
 				ingredients: ["Orange juice"],
 			},
@@ -274,7 +379,7 @@ const menuitems = [
 				stock: 10,
 				price: 3,
 				allergens: [],
-				img: "./assets/apple-juice.jpg",
+				img: "./assets/defaultDrink.jpg",
 				calories: "120",
 				ingredients: ["Apple juice"],
 			},
@@ -284,7 +389,7 @@ const menuitems = [
 				stock: 10,
 				price: 3,
 				allergens: [],
-				img: "./assets/lemonade.jpg",
+				img: "./assets/defaultDrink.jpg",
 				calories: "100",
 				ingredients: ["Lemon juice", "Water", "Sugar"],
 			},
@@ -294,7 +399,7 @@ const menuitems = [
 				stock: 10,
 				price: 3,
 				allergens: [],
-				img: "./assets/iced-tea.jpg",
+				img: "./assets/defaultDrink.jpg",
 				calories: "60",
 				ingredients: ["Black tea", "Water", "Sugar", "Lemon"],
 			},
@@ -304,7 +409,7 @@ const menuitems = [
 				stock: 10,
 				price: 1,
 				allergens: [],
-				img: "./assets/water.jpg",
+				img: "./assets/defaultDrink.jpg",
 				calories: "0",
 				ingredients: ["Cucumber", "Lime", "Water"],
 			},
@@ -314,7 +419,7 @@ const menuitems = [
 				stock: 10,
 				price: 4,
 				allergens: [],
-				img: "./assets/mango-smoothie.jpg",
+				img: "./assets/defaultDrink.jpg",
 				calories: "220",
 				ingredients: ["Mango", "Yogurt", "Milk", "Honey"],
 			},
@@ -324,7 +429,7 @@ const menuitems = [
 				stock: 10,
 				price: 4,
 				allergens: [],
-				img: "./assets/strawberry-banana-smoothie.jpg",
+				img: "./assets/defaultDrink.jpg",
 				calories: "180",
 				ingredients: ["Strawberries", "Banana", "Yogurt", "Milk", "Honey"],
 			},
@@ -334,7 +439,7 @@ const menuitems = [
 				stock: 10,
 				price: 5,
 				allergens: [],
-				img: "./assets/chocolate-milkshake.jpg",
+				img: "./assets/defaultDrink.jpg",
 				calories: "420",
 				ingredients: [
 					"Chocolate ice cream",
@@ -349,7 +454,7 @@ const menuitems = [
 				stock: 10,
 				price: 5,
 				allergens: [],
-				img: "./assets/vanilla-milkshake.jpg",
+				img: "./assets/defaultDrink.jpg",
 				calories: "380",
 				ingredients: [
 					"Vanilla ice cream",
@@ -364,7 +469,7 @@ const menuitems = [
 				stock: 10,
 				price: 3,
 				allergens: [],
-				img: "./assets/coffee.jpg",
+				img: "./assets/defaultDrink.jpg",
 				calories: "5",
 				ingredients: ["Coffee beans", "Water"],
 			},
@@ -374,7 +479,7 @@ const menuitems = [
 				stock: 10,
 				price: 4,
 				allergens: [],
-				img: "./assets/hot-chocolate.jpg",
+				img: "./assets/defaultDrink.jpg",
 				calories: "150",
 				ingredients: [
 					"Cocoa powder",
@@ -397,7 +502,7 @@ const menuitems = [
 				price: 6,
 				allergens: ["nut free", "gluten free", "dairy free"],
 				cal: 400,
-				img: "./assets/chicken-wings.jpg",
+				img: "./assets/defaultDish.jpg",
 				ingredients: ["Chicken wings", "Hot sauce", "Salt", "Pepper"],
 			},
 			{
@@ -407,7 +512,7 @@ const menuitems = [
 				price: 5,
 				allergens: ["nut free"],
 				cal: 300,
-				img: "./assets/mozzarella-sticks.jpg",
+				img: "./assets/defaultDish.jpg",
 				ingredients: [
 					"Mozzarella cheese sticks",
 					"Breadcrumbs",
@@ -423,7 +528,7 @@ const menuitems = [
 				price: 4,
 				allergens: ["nut free"],
 				cal: 300,
-				img: "./assets/garlic-bread.jpg",
+				img: "./assets/defaultDish.jpg",
 				ingredients: ["Baguette", "Garlic", "Butter", "Parsley", "Salt"],
 			},
 			{
@@ -433,7 +538,7 @@ const menuitems = [
 				price: 4,
 				allergens: ["nut free", "dairy free"],
 				cal: 300,
-				img: "./assets/onion-rings.jpg",
+				img: "./assets/defaultDish.jpg",
 				ingredients: ["Onions", "Flour", "Baking powder", "Salt", "Milk"],
 			},
 			{
@@ -443,7 +548,7 @@ const menuitems = [
 				price: 5,
 				allergens: ["nut free", "dairy free"],
 				cal: 300,
-				img: "./assets/bruschetta.jpg",
+				img: "./assets/defaultDish.jpg",
 				ingredients: ["Baguette", "Tomatoes", "Garlic", "Basil", "Olive oil"],
 			},
 			{
@@ -453,7 +558,7 @@ const menuitems = [
 				price: 7,
 				allergens: ["nut free", "gluten free", "dairy free"],
 				cal: 300,
-				img: "./assets/shrimp-cocktail.jpg",
+				img: "./assets/defaultDish.jpg",
 				ingredients: ["Shrimp", "Cocktail sauce", "Lemon", "Lettuce"],
 			},
 			{
@@ -463,7 +568,7 @@ const menuitems = [
 				price: 6,
 				allergens: ["nut free", "gluten free"],
 				cal: 200,
-				img: "./assets/caprese-salad.jpg",
+				img: "./assets/defaultDish.jpg",
 				ingredients: [
 					"Tomatoes",
 					"Mozzarella cheese",
@@ -479,7 +584,7 @@ const menuitems = [
 				price: 6,
 				allergens: ["nut free", "gluten free"],
 				cal: 300,
-				img: "./assets/spinach-artichoke-dip.jpg",
+				img: "./assets/defaultDish.jpg",
 				ingredients: [
 					"Spinach",
 					"Artichoke hearts",
@@ -496,7 +601,7 @@ const menuitems = [
 				ingredients: ["calamari rings", "flour", "spices", "lemon wedges"],
 				price: 10,
 				allergens: ["nut free", "gluten free"],
-				img: "./assets/starters-calamari.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 		],
 	},
@@ -519,7 +624,7 @@ const menuitems = [
 				],
 				price: 15,
 				allergens: ["nut free", "gluten free", "dairy free"],
-				img: "./assets/mains-grilled-salmon.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Mixed Grill",
@@ -541,7 +646,7 @@ const menuitems = [
 				],
 				price: 20,
 				allergens: ["nut free"],
-				img: "./assets/mains-grilled-salmon.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Beef Burger",
@@ -559,7 +664,7 @@ const menuitems = [
 				],
 				price: 12,
 				allergens: ["nut free"],
-				img: "./assets/mains-beef-burger.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Vegetable Stir-Fry",
@@ -576,7 +681,7 @@ const menuitems = [
 				],
 				price: 10,
 				allergens: ["nut free", "gluten free"],
-				img: "./assets/mains-vegetable-stir-fry.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Chicken Parmesan",
@@ -593,7 +698,7 @@ const menuitems = [
 				],
 				price: 14,
 				allergens: ["nut free"],
-				img: "./assets/mains-chicken-parmesan.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Pesto Pasta",
@@ -609,7 +714,7 @@ const menuitems = [
 				],
 				price: 11,
 				allergens: [],
-				img: "./assets/mains-pesto-pasta.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Shrimp Scampi",
@@ -627,7 +732,7 @@ const menuitems = [
 				],
 				price: 16,
 				allergens: ["nut free", "dairy free"],
-				img: "./assets/mains-shrimp-scampi.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Mushroom Risotto",
@@ -644,7 +749,7 @@ const menuitems = [
 				],
 				price: 13,
 				allergens: ["nut free", "gluten free"],
-				img: "./assets/mains-mushroom-risotto.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Grilled Chicken Caesar Salad",
@@ -660,7 +765,7 @@ const menuitems = [
 				],
 				price: 9,
 				allergens: ["nut free"],
-				img: "./assets/mains-chicken-caesar-salad.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Beef Stroganoff",
@@ -678,7 +783,7 @@ const menuitems = [
 				],
 				price: 15,
 				allergens: [],
-				img: "./assets/mains-beef-stroganoff.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Fish and Chips",
@@ -695,7 +800,7 @@ const menuitems = [
 				],
 				price: 13,
 				allergens: ["nut free", "dairy free"],
-				img: "./assets/mains-fish-and-chips.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Eggplant Parmesan",
@@ -712,7 +817,7 @@ const menuitems = [
 				],
 				price: 12,
 				allergens: ["nut free"],
-				img: "./assets/mains-eggplant-parmesan.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Lemon Herb Roasted Chicken",
@@ -731,7 +836,7 @@ const menuitems = [
 				],
 				price: 16,
 				allergens: ["nut free", "gluten free"],
-				img: "./assets/mains-lemon-herb-roasted-chicken.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Vegetable Lasagna",
@@ -749,7 +854,7 @@ const menuitems = [
 				],
 				price: 14,
 				allergens: ["nut free"],
-				img: "./assets/mains-vegetable-lasagna.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 		],
 	},
@@ -773,7 +878,7 @@ const menuitems = [
 				],
 				price: 8,
 				allergens: [],
-				img: "./assets/desserts-chocolate-brownie.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Cheesecake",
@@ -792,7 +897,7 @@ const menuitems = [
 				],
 				price: 8,
 				allergens: ["nut free"],
-				img: "./assets/desserts-cheesecake.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Vanilla Ice Cream",
@@ -802,7 +907,7 @@ const menuitems = [
 				ingredients: ["cream", "sugar", "vanilla extract"],
 				price: 6,
 				allergens: ["nut free", "gluten free"],
-				img: "./assets/desserts-vanilla-ice-cream.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Fruit Tart",
@@ -819,7 +924,7 @@ const menuitems = [
 				],
 				price: 10,
 				allergens: ["nut free"],
-				img: "./assets/desserts-fruit-tart.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Tiramisu",
@@ -836,7 +941,7 @@ const menuitems = [
 				],
 				price: 9,
 				allergens: ["nut free"],
-				img: "./assets/desserts-tiramisu.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 			{
 				name: "Strawberry Shortcake",
@@ -852,13 +957,15 @@ const menuitems = [
 				],
 				price: 6,
 				allergens: ["nut free"],
-				img: "./assets/desserts-strawberry-shortcake.jpg",
+				img: "./assets/defaultDish.jpg",
 			},
 		],
 	},
 ];
 
 const App = () => {
+	const [venueNtable, setVenueNtable] = useState({ venue: null, table: null });
+
 	const [selectedKCal, setSelectedKCal] = useState("clear");
 	const [selectedDietary, setSelectedDietary] = useState("clear");
 
@@ -869,7 +976,7 @@ const App = () => {
 	const [searchValue, setSearchValue] = useState("");
 
 	// to set up later on
-	const [user, setUser] = useState("mihaic@mihai.com");
+	const [user, setUser] = useState(null);
 
 	// to grab from db later on
 	const [receipts, setReceipts] = useState([
@@ -1033,6 +1140,9 @@ const App = () => {
 								setSelectedKCal={setSelectedKCal}
 								selectedDietary={selectedDietary}
 								setSelectedDietary={setSelectedDietary}
+								venueNtable={venueNtable}
+								setVenueNtable={setVenueNtable}
+								venues={venues}
 							/>
 						) : (
 							<Auth user={user} setUser={setUser} />
@@ -1072,6 +1182,8 @@ const App = () => {
 							menuitems={menuitems}
 							basketItems={basketItems}
 							setBasketItems={setBasketItems}
+							venueNtable={{venue:getVenueById(venues, venueNtable.venue), table:venueNtable.table}}
+							setVenueNtable={setVenueNtable}
 						/>
 					}
 				/>
@@ -1084,9 +1196,6 @@ const App = () => {
 				<Route path="/Privacy" element={<Privacy user={user} />} />
 				<Route path="/Symbol" element={<Symbol user={user} />} />
 				<Route path="/T&C" element={<TC user={user} />} />
-
-
-
 
 				<Route
 					path="/Signout"

@@ -15,3 +15,8 @@ export const calculateTotalPrice = (basketItems) => {
 	);
 	return totalPrice.toFixed(2);
 };
+
+export const getVenueById = (venues, id) => {
+	if(!venues || !id) return null
+	return venues.find((venue) => venue.id === id) || null;
+};

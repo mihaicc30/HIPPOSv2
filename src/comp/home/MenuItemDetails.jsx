@@ -67,11 +67,18 @@ const MenuItemDetails = ({ item, basketItems, setBasketItems, menuitems }) => {
 
 	return (
 		<div className="fixed inset-0 z-20 bg-[--c60] flex flex-col overflow-auto">
+			
+			<img
+				src={"../"+item.img}
+				className="h-[100px] w-[100%]"
+				style={{ objectFit: "cover", overflow: "hidden" }}
+			/>
 			<button className="mr-auto p-2 text-3xl" onClick={() => navigate(-1)}>
 				<AiOutlineLeft />
 			</button>
 
 			<div className="p-4 flex flex-col">
+				
 				<p className="text-xl font-bold mb-2">{item.name}</p>
 				<p className="text-sm mb-2 capitalize">
 					{item.ingredients.map((itemz, index) => (

@@ -1,23 +1,32 @@
+table and venue
+-get user gps coords and sort venues by distance
+
 Menu
 -animations
--search bar
 -menu dish pic
 -dish options
+- location / table selection
 
 Receipts
--styling
-<!-- -filtering -->
 -sorting
+-filtering
+-download option
 
 BASKET
--sorting
 -payment
--action button color
 -link stripe
+-create svg for drinks and food
 
 SETTINGS
 -overall functionality and complete each section
+-link contact messages
+-link email updates
+-link app version 
+-link last updated
 
 SignOut
 -animation
 -control data
+
+menu    - to create new imgs for dish/drink - aspect 16/9
+basket  - to create new imgs for dish/drink - aspect 1/1 or just use the 16/9 centred depending on image...
