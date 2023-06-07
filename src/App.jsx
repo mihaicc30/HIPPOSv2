@@ -869,7 +869,7 @@ const App = () => {
 	const [searchValue, setSearchValue] = useState("");
 
 	// to set up later on
-	const [user, setUser] = useState(null);
+	const [user, setUser] = useState("mihaic@mihai.com");
 
 	// to grab from db later on
 	const [receipts, setReceipts] = useState([

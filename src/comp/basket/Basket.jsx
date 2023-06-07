@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./Basket.css";
+import { isConsecutive, calculateTotalPrice } from "../../utils/BasketUtils";
 
 const Basket = ({ menuitems, basketItems, setBasketItems }) => {
 	const [computedBasket, setComputedBasket] = useState([]);
@@ -32,41 +33,20 @@ const Basket = ({ menuitems, basketItems, setBasketItems }) => {
 		setTotalPrice(totalPrice);
 	}, [computedBasket]);
 
-	const calculateTotalPrice = (basketItems) => {
-		const totalPrice = basketItems.reduce(
-			(total, item) => total + parseFloat(item.price * item.qty),
-			0,
-		);
-		return totalPrice.toFixed(2);
-	};
-
-	const isConsecutive = (arr) => {
-		const sortedArr = arr.sort((a, b) => a - b); // Sort the array in ascending order
-		for (let i = 0; i < sortedArr.length - 1; i++) {
-			if (sortedArr[i] + 1 !== sortedArr[i + 1]) {
-				return false; // Numbers are not consecutive
-			}
-		}
-		return true; // Numbers are consecutive
-	};
-
 	const checkIfCoursesNeedRefactoring = () => {
 		const uniqueCourses = [...new Set(basketItems.map((item) => item.course))];
-		console.log("🚀 ~ file: Basket.jsx:55 ~ checkIfCoursesNeedRefactoring ~ uniqueCourses:", uniqueCourses)
-		if (!uniqueCourses) return;
+		if (!uniqueCourses || uniqueCourses == 0) return;
 		const areCoursesConsecutive = isConsecutive(uniqueCourses);
 		if (!uniqueCourses.includes(1) || !areCoursesConsecutive) {
 			console.log("Basket needs refactoring.");
 			const updatedBasketItems = basketItems.map((item) => {
-				console.log(item, item.course);
 				const newCourse =
-					item.course > 1 && !uniqueCourses.includes(item.course - 1) 
+					item.course > 1 && !uniqueCourses.includes(item.course - 1)
 						? item.course - 1
 						: item.course;
 				return {
 					...item,
-					// course: newCourse > 1 ? newCourse : 1,
-					course: newCourse > 1 ? newCourse : item.course == 0 ? 0 : 1
+					course: newCourse > 1 ? newCourse : item.course == 0 ? 0 : 1,
 				};
 			});
 			setBasketItems(updatedBasketItems);
@@ -140,7 +120,7 @@ const Basket = ({ menuitems, basketItems, setBasketItems }) => {
 		}
 	};
 
-	const getUniqueCourses = () => {
+	const getUniqueCourses = (basket) => {
 		const uniqueCourses = basketItems.reduce((courses, item) => {
 			if (!courses.includes(item.course)) {
 				courses.push(item.course);
@@ -155,10 +135,6 @@ const Basket = ({ menuitems, basketItems, setBasketItems }) => {
 		console.log(itemz, e);
 		const updatedBasketItems = basketItems.map((item) => {
 			if (item.item === itemz) {
-				console.log(
-					"🚀 ~ file: Basket.jsx:154 ~ updatedBasketItems ~ item:",
-					item,
-				);
 				return {
 					...item,
 					course: parseInt(e),
@@ -166,11 +142,6 @@ const Basket = ({ menuitems, basketItems, setBasketItems }) => {
 			}
 			return item;
 		});
-		console.log(
-			"🚀 ~ file: Basket.jsx:163 ~ updatedBasketItems ~ updatedBasketItems:",
-			updatedBasketItems,
-		);
-
 		setBasketItems(updatedBasketItems);
 	};
 
@@ -180,7 +151,7 @@ const Basket = ({ menuitems, basketItems, setBasketItems }) => {
 				<p>The White Lion</p>
 				<p>Table: 6</p>
 			</div>
-			<div className="products flex flex-col gap-4 px-4 my-4  overflow-auto">
+			<div className="products flex flex-col gap-4 px-4 grow overflow-auto">
 				{getUniqueCourses().includes(0) && <p className="border-b-8">Drinks</p>}
 				{computedBasket.map((item, index) => {
 					if (item.course === 0) {
@@ -315,12 +286,12 @@ const Basket = ({ menuitems, basketItems, setBasketItems }) => {
 				})}
 			</div>
 
-			<p className="text-3xl text-center my-4 pt-4 border-t-2">
+			<p className="text-3xl text-center pt-4 border-t-2">
 				TOTAL £{totalPrice}
 			</p>
 			<button
 				disabled={parseFloat(totalPrice) <= 0}
-				className="bg-[--c1] rounded px-3 text-center py-3 my-4 mx-4 font-bold border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none">
+				className="bg-[--c1] rounded px-3 text-center py-3 mx-4 font-bold border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none">
 				Payment
 			</button>
 		</div>
