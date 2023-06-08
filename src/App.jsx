@@ -1199,7 +1199,7 @@ const App = () => {
 
 				<Route
 					path="/Signout"
-					element={<Signout user={user} setUser={setUser} />}
+					element={<Signout setUser={setUser} setVenueNtable={setVenueNtable}/>}
 				/>
 
 				<Route path="*" element={<Page404 />} />
