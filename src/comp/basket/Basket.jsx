@@ -4,6 +4,7 @@ import { isConsecutive, calculateTotalPrice } from "../../utils/BasketUtils";
 import { useNavigate } from "react-router-dom";
 
 const Basket = ({
+  user,
   menuitems,
   basketItems,
   setBasketItems,
@@ -11,11 +12,10 @@ const Basket = ({
   setVenueNtable,
 }) => {
   const nav = useNavigate();
-
   useEffect(() => {
-    if (!venueNtable.venue || !venueNtable.table) nav("/");
-    return;
+    if (!user || !venueNtable.venue || !venueNtable.table) return nav("/");
   }, []);
+
   if (!venueNtable.venue || !venueNtable.table) return;
 
   const [computedBasket, setComputedBasket] = useState([]);
@@ -166,6 +166,15 @@ const Basket = ({
     return;
   };
 
+  const handleNavigation = () => {
+    const data = {
+      totalPrice: totalPrice,
+      computedBasket: computedBasket
+    };
+
+    nav('/Payment', { state: data });
+  };
+
   return (
     <div className="basis-[80%] bg-[--c60] z-10 overflow-y-scroll flex flex-col">
       <div className="flex flex-col text-center my-4 pb-4 border-b-2 text-xl">
@@ -192,7 +201,6 @@ const Basket = ({
             </p>
             <p className="text-center my-auto under text-xl">
               Just check our delicious menu!
-             
               <button
                 className="bg-[--c1] rounded px-3 py-1 font-bold border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none text-3xl"
                 onClick={() => nav("/")}
@@ -359,6 +367,7 @@ const Basket = ({
       </p>
       <button
         disabled={parseFloat(totalPrice) <= 0}
+        onClick={handleNavigation}
         className="bg-[--c1] rounded px-3 text-center py-3 mx-4 font-bold border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none"
       >
         Payment

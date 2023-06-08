@@ -70,6 +70,8 @@ const Home = ({
 				/>
 			);
 
+		
+
 		return (
 			<div
 				className={`basis-[80%] flex flex-col bg-[--c60] z-10 ${
