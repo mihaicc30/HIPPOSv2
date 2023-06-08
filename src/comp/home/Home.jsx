@@ -258,7 +258,7 @@ const Home = ({
 							menuitems.map((item, index) => (
 								<div
 									key={index}
-									className="p-2 flex flex-col cursor-pointer hover:scale-[0.98] transition-all border-b-2"
+									className="p-2 flex flex-col cursor-pointer hover:scale-[0.98] transition-all border-b-2 animate-fadeUP1 opacity-0" style={{animationDelay:`0.${index}s`}}
 									onClick={() => nav(item.name)}>
 									<img
 										src={item.img}

@@ -12,20 +12,19 @@ const MobileFooter = ({basketQty}) => {
 	const loc = useLocation();
 	const [activeIndex, setActiveIndex] = useState("");
 
-	useEffect(() => {
-		console.log(loc);
-	}, [activeIndex]);
 
 	const handleDivClick = (index) => {
 		setActiveIndex(index);
 		nav(`/${index}`);
 	};
 
+	const menuPaths = ["/", "/Desserts", "/Breakfast", "/Kids%20Starters", "/Kids%20Mains", "/Drinks", "/Starters", "/Mains"];
+
 	return (
 		<div className="MobileFooter basis-[10%] flex justify-center gap-4 bg-[--c60] py-4 relative max-md:gap-1">
 			<div
 				className={`basis-[18%] transition-all cursor-pointer hover:scale-[0.98] active:scale-[0.90] rounded-3xl flex flex-col text-center text-lg justify-center font-semibold ${
-					loc.pathname === "/" ? "MAFA" : ""
+					menuPaths.includes(loc.pathname) ? "MAFA" : ""  ? "MAFA" : ""
 				}`}
 				onClick={() => handleDivClick("")}>
 				<span className="mx-auto text-3xl">

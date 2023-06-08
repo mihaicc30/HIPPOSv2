@@ -7,7 +7,7 @@ import MobileHeader from "../navBars/MobileHeader";
 const Layout = ({ user, setUser, basketQty }) => {
 
 	return (
-		<div className="flex flex-col justify-center h-[100svh]">
+		<div className="flex flex-col justify-center h-[100svh] relative">
 			{user && <MobileHeader user={user} />}
 			<Outlet />
 			{user && <MobileFooter user={user} basketQty={basketQty} />}

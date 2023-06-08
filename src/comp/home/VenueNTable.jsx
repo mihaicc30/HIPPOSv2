@@ -1,10 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { getVenueById } from "../../utils/BasketUtils";
 import { AiFillCaretRight } from "react-icons/ai";
 
 const VenueNTable = ({ venues, venueNtable, setVenueNtable }) => {
   const [searchLocationValue, setLocationSearchValue] = useState("");
   const [searchTableValue, setTableSearchValue] = useState("");
+  const searchInputRef = useRef(null);
+  const searchInputRef2 = useRef(null);
+
+  useEffect(() => {
+    if (!venueNtable.venue) searchInputRef.current.focus();
+    if (!venueNtable.table && venueNtable.venue)
+      searchInputRef2.current.focus();
+  }, [venueNtable]);
 
   const handleLocationInputChange = (event) => {
     setLocationSearchValue(event.target.value);
@@ -35,6 +43,7 @@ const VenueNTable = ({ venues, venueNtable, setVenueNtable }) => {
           </p>
           <div className="relative w-[100%]">
             <input
+              ref={searchInputRef}
               name="venuesearchinput"
               type="text"
               placeholder="Search..."
@@ -104,12 +113,14 @@ const VenueNTable = ({ venues, venueNtable, setVenueNtable }) => {
           </p>
           <div className="relative mx-4">
             <input
+              ref={searchInputRef2}
               name="venuesearchinput"
-              type="text"
+              type="number"
               placeholder="Search..."
-              className="w-[98%] mx-auto pl-10 pr-10 py-2 my-2 rounded"
+              className="w-[98%] mx-auto pl-10 pr-10 py-2 my-2 rounded "
               value={searchTableValue}
               onChange={handleTableInputChange}
+              min="0"
             />
             <span className="absolute top-[28px] left-2 -translate-y-3">
               🔍
@@ -124,22 +135,24 @@ const VenueNTable = ({ venues, venueNtable, setVenueNtable }) => {
               ✖
             </button>
           </div>
-          {getVenueById(venues, venueNtable.venue).table.map((venue, index) => {
-            return (
-              <div
-                onClick={() => handleTable(venue)}
-                key={index}
-                className="my-2 bg-[--c30] rounded px-3 py-2 border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none"
-              >
-                <div className="flex flex-nowrap">
-                  <p className="font-bold text-lg truncate w-[100%]">
-                    Table {venue}
-                  </p>
-                  <AiFillCaretRight className=" bg-[--c1] rounded my-auto p-[2px] text-xl font-bold border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none" />
+          {getVenueById(venues, venueNtable.venue).table
+            .filter((venue)=>String(venue).includes(String(searchTableValue)))
+            .map((venue, index) => {
+              return (
+                <div
+                  onClick={() => handleTable(venue)}
+                  key={index}
+                  className="my-2 bg-[--c30] rounded px-3 py-2 border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none"
+                >
+                  <div className="flex flex-nowrap">
+                    <p className="font-bold text-lg truncate w-[100%]">
+                      Table {venue}
+                    </p>
+                    <AiFillCaretRight className=" bg-[--c1] rounded my-auto p-[2px] text-xl font-bold border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none" />
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
         </div>
       </div>
     );

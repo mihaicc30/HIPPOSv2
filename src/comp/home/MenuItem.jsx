@@ -44,7 +44,7 @@ const MenuItem = ({ item }) => {
 				{item.items.map((menuItem, index) => (
 					<li key={index}>
 						<div
-							className="flex border-b-2 p-4 active:bg-[--clsec] hover:scale-[0.98] transition gap-4"
+							className="flex border-b-2 p-4 active:bg-[--clsec] hover:scale-[0.98] transition gap-4 animate-fadeUP1 opacity-0" style={{animationDelay:`0.${index}s`}}
 							onClick={() => handleItemClick(menuItem.name)}>
 							<div className="grow">
 								<p className="font-bold text-xl">{menuItem.name}</p>
