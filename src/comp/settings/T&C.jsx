@@ -80,7 +80,7 @@ const TC = ({user}) => {
       <details>
         <summary>6. Support:</summary>
         <p>
-          For any support or inquiries related to the App, please contact us at{" "}
+          For any support or inquiries related to the App, please contact us at
           <a href="mailto:alemihai25@gmail.com">alemihai25@gmail.com</a>. We
           will make our best efforts to assist you promptly.
         </p>

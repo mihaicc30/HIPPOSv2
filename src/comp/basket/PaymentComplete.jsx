@@ -23,9 +23,9 @@ const PaymentComplete = ({ user, venueNtable, basketItems, computedBasket, setBa
           {venueNtable.venue ? venueNtable.venue.address : null}
         </p>
         <p>Table: {venueNtable.table ? venueNtable.table : null}</p>
-        <p className="border-b-2"></p>
+        <p className="border-b-4 border-b-[--c1]"></p>
 
-        <p className="font-bold">{user}, thank you for your order and payment has been successfull!</p>
+        <p className="font-bold"><span className="capitalize">{user}</span>, thank you for your order and payment has been successfull!</p>
         <p>Your order has been confirmed!</p>
         <p>{total?.date}</p>
 
@@ -33,7 +33,6 @@ const PaymentComplete = ({ user, venueNtable, basketItems, computedBasket, setBa
         {total && total.computedBasket
         .sort((a, b) => parseInt(a.course) - parseInt(b.course))
         .map((item, index) => {
-          console.log(item.course);
             return (
               <div
                 key={crypto.randomUUID()}
@@ -63,7 +62,7 @@ const PaymentComplete = ({ user, venueNtable, basketItems, computedBasket, setBa
             );
           return null; // or handle the case when the condition is not met
         })}
-        <div className="flex justify-between mt-1">
+        <div className="flex justify-between mt-1 mb-10 pb-10">
 
         <p className="text-xl text-end">Total: </p>
         {total && <p className="text-xl font-bold text-end">£{total.totalPrice}</p> }

@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useEffect} from "react";
 import {
 	BrowserRouter,
 	Routes,
@@ -9,10 +9,17 @@ import {
 	useLocation,
 } from "react-router-dom";
 import { AiOutlineLeft, AiFillCaretRight } from "react-icons/ai";
+import { CheckAccess } from "../../utils/CheckAccess";
 
 // list belonging to a category from the menu
 const MenuItem = ({ item }) => {
 	const navigate = useNavigate();
+	
+	useEffect(() => {
+		(async () => {
+		  if (!(await CheckAccess("menu"))) navigate("/signout");
+		})();
+	  }, []);
 
 	const handleItemClick = (i) => {
 		// Navigate to the item details route

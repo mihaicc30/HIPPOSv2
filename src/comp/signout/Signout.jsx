@@ -6,13 +6,28 @@ import { FiLoader } from "react-icons/fi";
 const Signout = ({ setVenueNtable, setUser }) => {
   const nav = useNavigate();
   useEffect(() => {
+    
+    console.log("requesting logout ", `${import.meta.env.VITE_API}logout`);
     const timeout = setTimeout(() => {
-      setVenueNtable({ venue: null, table: null })
+      fetch(`${import.meta.env.VITE_API}logout`, {
+        method: "POST",
+        // credentials: "include",
+        headers: {
+          // Accept: "application/json",
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Credentials": true,
+        },
+        body: JSON.stringify({
+          v: import.meta.env.VITE_G,
+        }),
+      });
+      setVenueNtable({ venue: null, table: null });
       setUser(null);
+      localStorage.clear();
       nav("/");
-    }, 1000);
+    }, 100);
 
-    return () => clearTimeout(timeout); 
+    return () => clearTimeout(timeout);
   }, []);
 
   return (

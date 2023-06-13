@@ -1,14 +1,20 @@
 import React, { useEffect } from "react";
 import "./Settings.css";
 import { NavLink, useNavigate } from "react-router-dom";
+import { CheckAccess } from "../../utils/CheckAccess";
 
 import { AiFillCaretRight } from "react-icons/ai";
 
 const Settings = ({ user, setUser }) => {
   const nav = useNavigate();
+
   useEffect(() => {
     if (!user) return nav("/");
+    (async () => {
+      if (!(await CheckAccess("receipts"))) nav("/signout");
+    })();
   }, []);
+
   return (
     <div className="basis-[80%] bg-[--c60] z-10 overflow-y-scroll p-4 flex flex-col">
       <p className="font-bold text-lg pb-4 border-b-2">Account Services</p>

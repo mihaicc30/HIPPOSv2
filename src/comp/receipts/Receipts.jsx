@@ -1,14 +1,22 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./Receipts.css";
 import { useNavigate } from "react-router-dom";
+import { CheckAccess } from "../../utils/CheckAccess";
 
-const Receipts = ({ user, receipts }) => {
+const Receipts = ({ user }) => {
   const nav = useNavigate();
+  
+  const [receipts, setReceipts] = useState([])
   const [searchReceipts, setSearchReceipts] = useState("");
   const searchInputRef = useRef(null);
 
   useEffect(() => {
+    console.log("RRRRRRRRRRRR");
     if (!user) return nav("/");
+
+    (async () => {
+      if (!(await CheckAccess("receipts"))) nav("/signout");
+    })();
     searchInputRef.current.focus();
   }, []);
 

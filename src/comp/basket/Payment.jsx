@@ -21,12 +21,22 @@ const appearance = {
 const stripePromise = loadStripe(import.meta.env.VITE_S_PK);
 
 const Payment = ({ user }) => {
-  const location = useLocation();
-  const data = location.state.totalPrice;
-  const computedBasket = location.state.computedBasket;
   const nav = useNavigate();
 
-  console.log(">>>>>>>", computedBasket);
+  
+  useEffect(() => {
+    if (!user) return nav("/");
+    (async () => {
+      if (!(await CheckAccess("receipts"))) nav("/signout");
+    })();
+  }, []);
+
+  
+  const location = useLocation();
+  const data = location.state?.totalPrice;
+  const computedBasket = location.state?.computedBasket;
+
+
 
   const options = {
     mode: "payment",
@@ -75,7 +85,7 @@ const Payment = ({ user }) => {
       )}
       <div className="mx-4">
         <Elements stripe={stripePromise} options={options}>
-          <CheckoutForm data={data} computedBasket={computedBasket}/>
+          <CheckoutForm data={data} computedBasket={computedBasket} />
         </Elements>
       </div>
     </div>
@@ -89,12 +99,9 @@ const CheckoutForm = ({ data, computedBasket }) => {
   const [message, setMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsLoading(true);
-
 
     if (!stripe) {
       // Stripe.js hasn't yet loaded.
@@ -114,47 +121,63 @@ const CheckoutForm = ({ data, computedBasket }) => {
     }
 
     // Create the SetupIntent and obtain clientSecret
-    let api = `${import.meta.env.VITE_API}create-payment-intent2`;
-    const res = await fetch(api, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        amount: data,
-        v: import.meta.env.VITE_G,
-      }),
-    });
+    let api = `${import.meta.env.VITE_API}stripe/create-payment-intent2`;
+    try {
+      const res = await fetch(api, {
+        method: "POST",
+        headers: {
+          "auth-token": localStorage.getItem("jwtToken"),
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Credentials": true,
+        },
+        body: JSON.stringify({
+          amount: data,
+          v: import.meta.env.VITE_G,
+        }),
+      });
 
-    const { clientSecret: clientSecret } = await res.json();
-    console.log(clientSecret);
-    // Use the clientSecret and Elements instance to confirm the setup
-    const { errror } = await stripe.confirmPayment({
-      elements,
-      clientSecret,
-      confirmParams: {
-        return_url: `${window.location.origin}/PaymentComplete`,
-      },
-      // Uncomment below if you only want redirect for redirect-based payments
-      redirect: "if_required",
-    });
-
-    setIsLoading(false);
-    if (errror) {
-      if (errror.type === "card_error" || errror.type === "validation_error") {
+      if (res.status == 403) {
         setIsLoading(false);
-        setMessage(errror.message);
-      } else {
-        setIsLoading(false);
-        setMessage("An unexpected error occured.");
+        setMessage("Request denied.");
+        return;
       }
-    } else {
-      const dataz = {
-        totalPrice: data,
-        date: new Date().toLocaleString(),
-        computedBasket
-      };
-      nav("/PaymentComplete", { state: dataz });
+      const { clientSecret: clientSecret } = await res.json();
+      // Use the clientSecret and Elements instance to confirm the setup
+      const { errror } = await stripe.confirmPayment({
+        elements,
+        clientSecret,
+        confirmParams: {
+          return_url: `${window.location.origin}/PaymentComplete`,
+        },
+        // Uncomment below if you only want redirect for redirect-based payments
+        redirect: "if_required",
+      });
+
+      setIsLoading(false);
+      if (errror) {
+        if (
+          errror.type === "card_error" ||
+          errror.type === "validation_error"
+        ) {
+          setIsLoading(false);
+          setMessage(errror.message);
+        } else {
+          setIsLoading(false);
+          setMessage("An unexpected error occured.");
+        }
+      } else {
+        const dataz = {
+          totalPrice: data,
+          date: new Date().toLocaleString(),
+          computedBasket,
+        };
+        nav("/PaymentComplete", { state: dataz });
+      }
+    } catch (error) {
+      console.log(error.message);
+      setIsLoading(false);
+      setMessage("Request denied.");
+      return;
     }
   };
 
@@ -163,10 +186,10 @@ const CheckoutForm = ({ data, computedBasket }) => {
       {message && (
         <div
           id="payment-message"
-          className="animate-fadeUP1 border-2 border-[--clwar] bg-[--c30] flex justify-between p-4"
+          className="animate-fadeUP1 border-2 border-[--clwar] bg-[--c30] flex justify-between p-4 my-4"
         >
           <p className="flex">
-            <AiFillExclamationCircle className="m-0 mr-1 fill-[--clwar] text-2xl" />{" "}
+            <AiFillExclamationCircle className="m-0 mr-1 fill-[--clwar] text-2xl" />
             {message}
           </p>
           <button onClick={() => setMessage("")}>✖</button>
@@ -204,9 +227,34 @@ const CheckoutForm = ({ data, computedBasket }) => {
               ></circle>
             </svg>
           </div>
-          <p className="mt-8 text-xl mx-auto animate-fadeUP1 py-4">Processing...</p>
+          <p className="mt-8 text-xl mx-auto animate-fadeUP1 py-4">
+            Processing...
+          </p>
         </>
       ) : null}
+
+      <div className="p-4 m-4 border-4 shadow-md shadow-[--clwar]">
+        <p className="font-bold text-xl whitespace-nowrap inline-flex gap-4">
+          <AiFillExclamationCircle className="fill-[--clwar]" /> Note:
+        </p>
+        <p>
+          For <span className="underline">testing purposes</span>, Stripe is in
+          Test Mode. To fully explore and utilize the app's complete
+          functionality, you can use the following card details:
+        </p>
+        <ul className="text-lg font-bold">
+          <li>Card Number: 4242 4242 4242 4242</li>
+          <li>Expiry: 04/24</li>
+          <li>CVC: 242</li>
+          <li>Postal Code: 2424</li>
+        </ul>
+        <p>
+          Please note that these are <span className="font-bold">dummy</span>
+          card details provided by Stripe for testing purposes. They are
+          <span className="font-bold">not</span> associated with any real
+          payment method or account!
+        </p>
+      </div>
     </form>
   );
 };

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./Basket.css";
 import { isConsecutive, calculateTotalPrice } from "../../utils/BasketUtils";
 import { useNavigate } from "react-router-dom";
+import { CheckAccess } from "../../utils/CheckAccess";
 
 const Basket = ({
   user,
@@ -14,6 +15,11 @@ const Basket = ({
   const nav = useNavigate();
   useEffect(() => {
     if (!user || !venueNtable.venue || !venueNtable.table) return nav("/");
+
+    (async () => {
+      if (!(await CheckAccess("baskets"))) nav("/signout");
+    })();
+
   }, []);
 
   if (!venueNtable.venue || !venueNtable.table) return;
@@ -169,10 +175,10 @@ const Basket = ({
   const handleNavigation = () => {
     const data = {
       totalPrice: totalPrice,
-      computedBasket: computedBasket
+      computedBasket: computedBasket,
     };
 
-    nav('/Payment', { state: data });
+    nav("/Payment", { state: data });
   };
 
   return (

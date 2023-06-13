@@ -26,5 +26,18 @@ SignOut
 -animation
 -control data
 
+
+Payment Confirmation
+-push order to DB as -future idea - stock management if time and i get there
+                    -receipts
+                    -active orders
+                    -reduce stock upon successfull order
+-check & adjust qty is not available => issue stripe refund with the rest => show message
+
+
+
+
 menu    - to create new imgs for dish/drink - aspect 16/9
 basket  - to create new imgs for dish/drink - aspect 1/1 or just use the 16/9 centred depending on image...
+
+<!-- https://github.com/safak/youtube/blob/react-social-login/client/src/components/Navbar.jsx -->
