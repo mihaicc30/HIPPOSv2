@@ -1,8 +1,17 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
+import { auth, db, logout } from "./firebase/config.jsx";
+import { useAuthState } from "react-firebase-hooks/auth";
 
-import { Routes, Route, Outlet, NavLink } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Outlet,
+  NavLink,
+  BrowserRouter,
+} from "react-router-dom";
 
+// Routes
 import MenuItem from "./comp/home/MenuItem";
 import MenuItemDetails from "./comp/home/MenuItemDetails";
 import Home from "./comp/home/Home";
@@ -14,7 +23,6 @@ import Basket from "./comp/basket/Basket";
 import Payment from "./comp/basket/Payment";
 import PaymentComplete from "./comp/basket/PaymentComplete";
 import Page404 from "./comp/Page404";
-
 import Settings from "./comp/Settings/Settings";
 import Contact from "./comp/Settings/Contact";
 import FAQ from "./comp/Settings/Faq";
@@ -25,16 +33,15 @@ import Symbol from "./comp/Settings/Symbol";
 import TC from "./comp/Settings/T&C";
 
 import { getVenueById } from "./utils/BasketUtils";
+import { grabProducts } from "./utils/grabProducts";
 
 import { loadStripe } from "@stripe/stripe-js";
-
-
 
 const venues = [
   {
     id: 1,
     name: "The White Lion",
-    email:"",
+    email: "",
     address: "Unit 6, C, Gregory's Mill St, Worcester WR3 8BA",
     phone: "12345 1234 123",
     website: "theawesomelionwebsite.co.uk",
@@ -47,7 +54,7 @@ const venues = [
   {
     id: 2,
     name: "The Red Lion",
-    email:"",
+    email: "",
     address: "Unit 1B, Battery Retail Park, Selly Oak, Birmingham B29 6SJ",
     phone: "12345 1234 123",
     website: "theawesomelionwebsite.co.uk",
@@ -58,7 +65,7 @@ const venues = [
   {
     id: 3,
     name: "The Black Lion",
-    email:"",
+    email: "",
     address: "Brompton House, Station Rd, Broadway WR12 7DE",
     phone: "12345 1234 123",
     website: "theawesomelionwebsite.co.uk",
@@ -69,7 +76,7 @@ const venues = [
   {
     id: 4,
     name: "The Old Lion Big Name Venue",
-    email:"",
+    email: "",
     address: "Matson Ln, Matson, Gloucester GL4 6EA",
     phone: "12345 1234 123",
     website: "theawesomelionwebsite.co.uk",
@@ -80,7 +87,7 @@ const venues = [
   {
     id: 5,
     name: "The Blue Lion",
-    email:"",
+    email: "",
     address: "123 Blue Street, Blueville, BL12 3BL",
     phone: "12345 1234 123",
     website: "thebluelionwebsite.co.uk",
@@ -91,7 +98,7 @@ const venues = [
   {
     id: 6,
     name: "The Green Lion",
-    email:"",
+    email: "",
     address: "456 Green Road, Greenvale, GR34 5GR",
     phone: "12345 1234 123",
     website: "thegreenlionwebsite.co.uk",
@@ -102,7 +109,7 @@ const venues = [
   {
     id: 7,
     name: "The Yellow Lion",
-    email:"",
+    email: "",
     address: "789 Yellow Avenue, Yellowtown, YL56 7YL",
     phone: "12345 1234 123",
     website: "theyellowlionwebsite.co.uk",
@@ -113,7 +120,7 @@ const venues = [
   {
     id: 8,
     name: "The Purple Lion",
-    email:"",
+    email: "",
     address: "987 Purple Close, Purpletown, PT98 7PT",
     phone: "12345 1234 123",
     website: "thepurplelionwebsite.co.uk",
@@ -124,7 +131,7 @@ const venues = [
   {
     id: 9,
     name: "The Orange Lion",
-    email:"",
+    email: "",
     address: "654 Orange Lane, Orangecity, OC65 4OC",
     phone: "12345 1234 123",
     website: "theorangelionwebsite.co.uk",
@@ -135,7 +142,7 @@ const venues = [
   {
     id: 10,
     name: "The Pink Lion",
-    email:"",
+    email: "",
     address: "321 Pink Crescent, Pinkville, PK32 1PK",
     phone: "12345 1234 123",
     website: "thepinklionwebsite.co.uk",
@@ -144,1892 +151,14 @@ const venues = [
     coords: [{ long: "51.789012" }, { lat: "-1.789012" }],
   },
 ];
-
-// to grab from db later on
-const menuitems = [
-  {
-    name: "Breakfast",
-    img: "./assets/breakfast.jpg",
-    items: [
-      {
-        name: "Full Breakfast",
-        cal: 350,
-        tag: [],
-        stock: 10,
-        ingredients: [
-          "free range eggs",
-          "sausage",
-          "bacon",
-          "mushroom",
-          "tomato",
-          "baked beans",
-          "toast",
-          "butter",
-        ],
-        price: 10,
-        allergens: ["nut free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Porridge",
-        cal: 350,
-        tag: ["vegetarian"],
-        stock: 10,
-        ingredients: ["scottish oats", "milk", "honey", "wallnuts", "bannana"],
-        price: 6,
-        allergens: ["nut free", "gluten free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: true,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: true,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Avocado on Toast",
-        cal: 350,
-        tag: ["vegetarian"],
-        stock: 10,
-        ingredients: [
-          "turmeric sourdough",
-          "smashed avocado",
-          "lemon",
-          "cherry tomatoes",
-          "feta cheese",
-          "pomegranades",
-          "watercress",
-          "poached egg",
-          "pine nuts",
-        ],
-        price: 9,
-        allergens: [],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Scrambled Eggs",
-        cal: 300,
-        tag: ["vegetarian"],
-        stock: 10,
-        ingredients: ["eggs", "salt", "pepper", "butter"],
-        price: 8,
-        allergens: ["nut free", "gluten free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "French Toast",
-        cal: 400,
-        tag: ["vegetarian"],
-        stock: 10,
-        ingredients: ["bread", "eggs", "milk", "cinnamon", "sugar"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        price: 7,
-        allergens: ["nut free"],
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Yogurt Parfait",
-        cal: 250,
-        tag: ["vegetarian"],
-        stock: 10,
-        ingredients: ["yogurt", "granola", "mixed berries", "honey"],
-        price: 6,
-        allergens: ["nut free", "gluten free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Protein Pancakes",
-        cal: 450,
-        tag: [],
-        stock: 10,
-        ingredients: ["oats", "protein powder", "banana", "eggs", "milk"],
-        price: 10,
-        allergens: ["nut free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Veggie Omelette",
-        cal: 300,
-        tag: ["vegetarian"],
-        stock: 10,
-        ingredients: ["eggs", "bell peppers", "onions", "spinach", "cheese"],
-        price: 8,
-        allergens: ["nut free", "gluten free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-    ],
-  },
-  {
-    name: "Kids Starters",
-    img: "./assets/kids.jpg",
-    items: [
-      {
-        name: "Kids Mozzarella Sticks",
-        tag: ["vegetarian"],
-        stock: 10,
-        price: 2,
-        allergens: ["nut free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        cal: 300,
-        img: "./assets/defaultDish.jpg",
-        ingredients: [
-          "Mozzarella cheese sticks",
-          "Breadcrumbs",
-          "Eggs",
-          "Flour",
-          "Marinara sauce",
-        ],
-      },
-      {
-        name: "Kids Garlic Bread",
-        tag: ["vegetarian"],
-        stock: 10,
-        price: 2,
-        allergens: ["nut free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        cal: 300,
-        img: "./assets/defaultDish.jpg",
-        ingredients: ["Baguette", "Garlic", "Butter", "Parsley", "Salt"],
-      },
-      {
-        name: "Kids Onion Rings",
-        tag: ["vegetarian", "vegan"],
-        stock: 10,
-        price: 2,
-        allergens: ["nut free", "dairy free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        cal: 300,
-        img: "./assets/defaultDish.jpg",
-        ingredients: ["Onions", "Flour", "Baking powder", "Salt", "Milk"],
-      },
-    ],
-  },
-  {
-    name: "Kids Mains",
-    img: "./assets/kids.jpg",
-    items: [
-      {
-        name: "Kids Chicken Nuggets",
-        cal: 250,
-        tag: [],
-        stock: 10,
-        ingredients: ["chicken breast", "breadcrumbs", "spices"],
-        price: 5,
-        allergens: ["nut free", "gluten free", "dairy free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Kids Cheese Pizza",
-        cal: 350,
-        tag: ["vegetarian"],
-        stock: 10,
-        ingredients: ["pizza dough", "tomato sauce", "mozzarella cheese"],
-        price: 7,
-        allergens: ["nut free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Kids Grilled Cheese Sandwich",
-        cal: 300,
-        tag: ["vegetarian"],
-        stock: 10,
-        ingredients: ["cheddar", "cheese", "bread", "butter"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        price: 4,
-        allergens: ["nut free"],
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Kids Peanut Butter and Jelly Sandwich",
-        cal: 280,
-        tag: ["vegetarian"],
-        stock: 10,
-        ingredients: ["peanut butter", "jelly", "bread"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        price: 3,
-        allergens: [],
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Kids Macaroni and Cheese",
-        cal: 450,
-        tag: ["vegetarian"],
-        stock: 10,
-        ingredients: ["macaroni pasta", "cheddar cheese", "milk"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        price: 7,
-        allergens: ["nut free"],
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Kids Mini Pancakes",
-        cal: 300,
-        tag: ["vegetarian"],
-        stock: 10,
-        ingredients: ["pancake batter", "maple syrup", "fruits"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        price: 6,
-        allergens: ["nut free"],
-        img: "./assets/defaultDish.jpg",
-      },
-    ],
-  },
-  {
-    name: "Drinks",
-    img: "./assets/drinks.jpg",
-    items: [
-      {
-        name: "Coca-Cola",
-        tag: ["carbonated", "soft drink"],
-        stock: 10,
-        price: 2,
-        allergens: [],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDrink.jpg",
-        calories: "140",
-        ingredients: [
-          "Carbonated water",
-          "High fructose corn syrup",
-          "Caramel color",
-          "Phosphoric acid",
-          "Natural flavors",
-          "Caffeine",
-        ],
-      },
-      {
-        name: "Orange Juice",
-        tag: ["fruit juice", "non-alcoholic"],
-        stock: 10,
-        price: 3,
-        allergens: [],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDrink.jpg",
-        calories: "110",
-        ingredients: ["Orange juice"],
-      },
-      {
-        name: "Apple Juice",
-        tag: ["fruit juice", "non-alcoholic"],
-        stock: 10,
-        price: 3,
-        allergens: [],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDrink.jpg",
-        calories: "120",
-        ingredients: ["Apple juice"],
-      },
-      {
-        name: "Lemonade",
-        tag: ["carbonated", "non-alcoholic"],
-        stock: 10,
-        price: 3,
-        allergens: [],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDrink.jpg",
-        calories: "100",
-        ingredients: ["Lemon juice", "Water", "Sugar"],
-      },
-      {
-        name: "Iced Tea",
-        tag: ["beverage", "non-alcoholic"],
-        stock: 10,
-        price: 3,
-        allergens: [],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDrink.jpg",
-        calories: "60",
-        ingredients: ["Black tea", "Water", "Sugar", "Lemon"],
-      },
-      {
-        name: "Cucumber & Lime Water",
-        tag: ["beverage", "non-alcoholic"],
-        stock: 10,
-        price: 1,
-        allergens: [],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDrink.jpg",
-        calories: "0",
-        ingredients: ["Cucumber", "Lime", "Water"],
-      },
-      {
-        name: "Mango Smoothie",
-        tag: ["smoothie", "non-alcoholic"],
-        stock: 10,
-        price: 4,
-        allergens: [],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDrink.jpg",
-        calories: "220",
-        ingredients: ["Mango", "Yogurt", "Milk", "Honey"],
-      },
-      {
-        name: "Strawberry Banana Smoothie",
-        tag: ["smoothie", "non-alcoholic"],
-        stock: 10,
-        price: 4,
-        allergens: [],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDrink.jpg",
-        calories: "180",
-        ingredients: ["Strawberries", "Banana", "Yogurt", "Milk", "Honey"],
-      },
-      {
-        name: "Chocolate Milkshake",
-        tag: ["milkshake", "non-alcoholic"],
-        stock: 10,
-        price: 5,
-        allergens: [],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDrink.jpg",
-        calories: "420",
-        ingredients: [
-          "Chocolate ice cream",
-          "Milk",
-          "Whipped cream",
-          "Chocolate syrup",
-        ],
-      },
-      {
-        name: "Vanilla Milkshake",
-        tag: ["milkshake", "non-alcoholic"],
-        stock: 10,
-        price: 5,
-        allergens: [],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDrink.jpg",
-        calories: "380",
-        ingredients: [
-          "Vanilla ice cream",
-          "Milk",
-          "Whipped cream",
-          "Vanilla extract",
-        ],
-      },
-      {
-        name: "Coffee",
-        tag: ["hot beverage", "caffeinated"],
-        stock: 10,
-        price: 3,
-        allergens: [],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDrink.jpg",
-        calories: "5",
-        ingredients: ["Coffee beans", "Water"],
-      },
-      {
-        name: "Hot Chocolate",
-        tag: ["hot beverage", "non-alcoholic"],
-        stock: 10,
-        price: 4,
-        allergens: [],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDrink.jpg",
-        calories: "150",
-        ingredients: [
-          "Cocoa powder",
-          "Milk",
-          "Sugar",
-          "Whipped cream",
-          "Chocolate shavings",
-        ],
-      },
-    ],
-  },
-  {
-    name: "Starters",
-    img: "./assets/starters.jpg",
-    items: [
-      {
-        name: "Chicken Wings",
-        tag: ["chicken", "spicy"],
-        stock: 10,
-        price: 6,
-        allergens: ["nut free", "gluten free", "dairy free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        cal: 400,
-        img: "./assets/defaultDish.jpg",
-        ingredients: ["Chicken wings", "Hot sauce", "Salt", "Pepper"],
-      },
-      {
-        name: "Mozzarella Sticks",
-        tag: ["vegetarian"],
-        stock: 10,
-        price: 5,
-        allergens: ["nut free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        cal: 300,
-        img: "./assets/defaultDish.jpg",
-        ingredients: [
-          "Mozzarella cheese sticks",
-          "Breadcrumbs",
-          "Eggs",
-          "Flour",
-          "Marinara sauce",
-        ],
-      },
-      {
-        name: "Garlic Bread",
-        tag: ["vegetarian"],
-        stock: 10,
-        price: 4,
-        allergens: ["nut free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        cal: 300,
-        img: "./assets/defaultDish.jpg",
-        ingredients: ["Baguette", "Garlic", "Butter", "Parsley", "Salt"],
-      },
-      {
-        name: "Onion Rings",
-        tag: ["vegetarian", "vegan"],
-        stock: 10,
-        price: 4,
-        allergens: ["nut free", "dairy free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        cal: 300,
-        img: "./assets/defaultDish.jpg",
-        ingredients: ["Onions", "Flour", "Baking powder", "Salt", "Milk"],
-      },
-      {
-        name: "Bruschetta",
-        tag: ["vegetarian", "vegan"],
-        stock: 10,
-        price: 5,
-        allergens: ["nut free", "dairy free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        cal: 300,
-        img: "./assets/defaultDish.jpg",
-        ingredients: ["Baguette", "Tomatoes", "Garlic", "Basil", "Olive oil"],
-      },
-      {
-        name: "Shrimp Cocktail",
-        tag: ["shrimp", "seafood"],
-        stock: 10,
-        price: 7,
-        allergens: ["nut free", "gluten free", "dairy free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        cal: 300,
-        img: "./assets/defaultDish.jpg",
-        ingredients: ["Shrimp", "Cocktail sauce", "Lemon", "Lettuce"],
-      },
-      {
-        name: "Caprese Salad",
-        tag: ["vegetarian"],
-        stock: 10,
-        price: 6,
-        allergens: ["nut free", "gluten free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        cal: 200,
-        img: "./assets/defaultDish.jpg",
-        ingredients: [
-          "Tomatoes",
-          "Mozzarella cheese",
-          "Basil",
-          "Balsamic glaze",
-          "Salt",
-        ],
-      },
-      {
-        name: "Spinach Artichoke Dip",
-        tag: ["vegetarian", "vegan"],
-        stock: 10,
-        price: 6,
-        allergens: ["nut free", "gluten free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        cal: 300,
-        img: "./assets/defaultDish.jpg",
-        ingredients: [
-          "Spinach",
-          "Artichoke hearts",
-          "Cream cheese",
-          "Sour cream",
-          "Parmesan cheese",
-        ],
-      },
-      {
-        name: "Crispy Calamari",
-        cal: 300,
-        tag: [],
-        stock: 10,
-        ingredients: ["calamari rings", "flour", "spices", "lemon wedges"],
-        price: 10,
-        allergens: ["nut free", "gluten free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-    ],
-  },
-  {
-    name: "Mains",
-    img: "./assets/mains.jpeg",
-    items: [
-      {
-        name: "Grilled Salmon",
-        cal: 400,
-        tag: [],
-        stock: 10,
-        ingredients: [
-          "salmon fillet",
-          "lemon",
-          "dill",
-          "olive oil",
-          "salt",
-          "pepper",
-        ],
-        price: 15,
-        allergens: ["nut free", "gluten free", "dairy free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Mixed Grill",
-        cal: 2100,
-        tag: [],
-        stock: 10,
-        ingredients: [
-          "pork",
-          "lamb",
-          "beef",
-          "sausage",
-          "egg",
-          "black pudding",
-          "chips",
-          "salad",
-          "tomato",
-          "mushroom",
-          "gammon",
-        ],
-        price: 20,
-        allergens: ["nut free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Beef Burger",
-        cal: 500,
-        tag: [],
-        stock: 10,
-        ingredients: [
-          "beef patty",
-          "brioche bun",
-          "lettuce",
-          "tomato",
-          "onion",
-          "cheese",
-          "pickles",
-        ],
-        price: 12,
-        allergens: ["nut free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Vegetable Stir-Fry",
-        cal: 300,
-        tag: ["vegetarian", "vegan"],
-        stock: 10,
-        ingredients: [
-          "mixed vegetables",
-          "tofu",
-          "soy sauce",
-          "ginger",
-          "garlic",
-          "sesame oil",
-        ],
-        price: 10,
-        allergens: ["nut free", "gluten free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Chicken Parmesan",
-        cal: 450,
-        tag: [],
-        stock: 10,
-        ingredients: [
-          "chicken breast",
-          "bread crumbs",
-          "Parmesan cheese",
-          "marinara sauce",
-          "mozzarella cheese",
-          "spaghetti",
-        ],
-        price: 14,
-        allergens: ["nut free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Pesto Pasta",
-        cal: 380,
-        tag: ["vegetarian"],
-        stock: 10,
-        ingredients: [
-          "penne pasta",
-          "basil pesto",
-          "cherry tomatoes",
-          "pine nuts",
-          "Parmesan cheese",
-        ],
-        price: 11,
-        allergens: [],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Shrimp Scampi",
-        cal: 320,
-        tag: [],
-        stock: 10,
-        ingredients: [
-          "shrimp",
-          "breadcrumbs",
-          "lemon",
-          "tartare",
-          "chips",
-          "salad",
-          "parsley",
-        ],
-        price: 16,
-        allergens: ["nut free", "dairy free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Mushroom Risotto",
-        cal: 380,
-        tag: ["vegetarian"],
-        stock: 10,
-        ingredients: [
-          "arborio rice",
-          "mushrooms",
-          "onion",
-          "garlic",
-          "vegetable broth",
-          "Parmesan cheese",
-        ],
-        price: 13,
-        allergens: ["nut free", "gluten free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Grilled Chicken Caesar Salad",
-        cal: 320,
-        tag: [],
-        stock: 10,
-        ingredients: [
-          "grilled chicken breast",
-          "romaine lettuce",
-          "croutons",
-          "Parmesan cheese",
-          "Caesar dressing",
-        ],
-        price: 9,
-        allergens: ["nut free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Beef Stroganoff",
-        cal: 480,
-        tag: [],
-        stock: 10,
-        ingredients: [
-          "beef sirloin",
-          "mushrooms",
-          "onion",
-          "garlic",
-          "sour cream",
-          "beef broth",
-          "egg noodles",
-        ],
-        price: 15,
-        allergens: [],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Fish and Chips",
-        cal: 550,
-        tag: [],
-        stock: 10,
-        ingredients: [
-          "white fish fillets",
-          "flour",
-          "beer",
-          "potatoes",
-          "tartar sauce",
-          "lemon wedges",
-        ],
-        price: 13,
-        allergens: ["nut free", "dairy free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Eggplant Parmesan",
-        cal: 420,
-        tag: ["vegetarian"],
-        stock: 10,
-        ingredients: [
-          "eggplant",
-          "bread crumbs",
-          "Parmesan cheese",
-          "marinara sauce",
-          "mozzarella cheese",
-          "spaghetti",
-        ],
-        price: 12,
-        allergens: ["nut free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Lemon Herb Roasted Chicken",
-        cal: 400,
-        tag: [],
-        stock: 10,
-        ingredients: [
-          "chicken",
-          "lemon",
-          "rosemary",
-          "thyme",
-          "garlic",
-          "butter",
-          "potatoes",
-          "carrots",
-        ],
-        price: 16,
-        allergens: ["nut free", "gluten free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Vegetable Lasagna",
-        cal: 360,
-        tag: ["vegetarian"],
-        stock: 10,
-        ingredients: [
-          "lasagna noodles",
-          "spinach",
-          "mushrooms",
-          "zucchini",
-          "ricotta cheese",
-          "marinara sauce",
-          "mozzarella cheese",
-        ],
-        price: 14,
-        allergens: ["nut free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-    ],
-  },
-  {
-    name: "Desserts",
-    img: "./assets/deserts.jpg",
-    items: [
-      {
-        name: "Chocolate Brownie",
-        cal: 350,
-        tag: ["vegetarian"],
-        stock: 10,
-        ingredients: [
-          "chocolate",
-          "butter",
-          "sugar",
-          "eggs",
-          "flour",
-          "vanilla extract",
-          "walnuts",
-        ],
-        price: 8,
-        allergens: [],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Cheesecake",
-        cal: 450,
-        tag: ["vegetarian"],
-        stock: 10,
-        ingredients: [
-          "graham cracker crumbs",
-          "butter",
-          "cream cheese",
-          "sugar",
-          "sour cream",
-          "vanilla extract",
-          "eggs",
-          "strawberry topping",
-        ],
-        price: 8,
-        allergens: ["nut free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Vanilla Ice Cream",
-        cal: 200,
-        tag: ["vegetarian"],
-        stock: 10,
-        ingredients: ["cream", "sugar", "vanilla extract"],
-        price: 6,
-        allergens: ["nut free", "gluten free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Fruit Tart",
-        cal: 250,
-        tag: ["vegetarian"],
-        stock: 10,
-        ingredients: [
-          "pastry dough",
-          "pastry cream",
-          "strawberries",
-          "kiwi",
-          "blueberries",
-          "apricot glaze",
-        ],
-        price: 10,
-        allergens: ["nut free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Tiramisu",
-        cal: 320,
-        tag: ["vegetarian"],
-        stock: 10,
-        ingredients: [
-          "ladyfingers",
-          "espresso",
-          "mascarpone cheese",
-          "sugar",
-          "cocoa powder",
-          "rum or coffee liqueur",
-        ],
-        price: 9,
-        allergens: ["nut free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-      {
-        name: "Strawberry Shortcake",
-        cal: 280,
-        tag: ["vegetarian"],
-        stock: 10,
-        ingredients: [
-          "shortcakes",
-          "strawberries",
-          "whipped cream",
-          "sugar",
-          "vanilla extract",
-        ],
-        price: 6,
-        allergens: ["nut free"],
-        priceOffer:null,
-        allergensList: {
-          Meat: false,
-          Celery: false,
-          Crustaceans: false,
-          Fish: false,
-          Milk: false,
-          Mustard: false,
-          Peanuts: false,
-          Soybeans: false,
-          Gluten: false,
-          Egg: false,
-          Lupin: false,
-          Moluscs: false,
-          Nuts: false,
-          SesameSeeds: false,
-          Sulphur: false,
-        },
-        img: "./assets/defaultDish.jpg",
-      },
-    ],
-  },
-];
+// await grabProducts()
 
 const App = () => {
-  // to set up later on
-  const [user, setUser] = useState(null);
+  const [user, loading, error] = useAuthState(auth);
+
   const [venueNtable, setVenueNtable] = useState({ venue: null, table: null });
 
+  const [menuitems, setMenuitems] = useState([]);
   const [selectedKCal, setSelectedKCal] = useState("clear");
   const [selectedDietary, setSelectedDietary] = useState("clear");
   const [toggleGrid, setToggleGrid] = useState(false);
@@ -2037,15 +166,7 @@ const App = () => {
   const [searchValue, setSearchValue] = useState("");
   const [basketQty, setBasketQty] = useState(0);
 
-
-  // to grab from db later on
-  const [basketItems, setBasketItems] = useState([
-    // { item: "Avocado on Toast", qty: 2, course: 1 },
-    // { item: "Full Breakfast", qty: 3, course: 2 },
-    // { item: "Mixed Grill", qty: 3, course: 2 },
-    // { item: "Porridge", qty: 1, course: 3 },
-    // { item: "Lemonade", qty: 1, course: 0 },
-  ]);
+  const [basketItems, setBasketItems] = useState([]);
 
   const calculateTotalQuantity = () => {
     const totalQty = basketItems.reduce(
@@ -2056,24 +177,48 @@ const App = () => {
   };
 
   useEffect(() => {
+    console.log(user);
+    async function get() {
+      try {
+        console.log("Grabbing menu");
+        await fetch(`${import.meta.env.VITE_API}grabProducts`, {
+          method: "POST",
+          headers: {
+            
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Credentials": true,
+          },
+          body: JSON.stringify({
+            v: import.meta.env.VITE_G,
+          }),
+        }).then(async (results) => {
+          const resp = await results.json();
+          setMenuitems(resp);
+        });
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+    get();
+  }, [user]);
+
+  useEffect(() => {
     calculateTotalQuantity();
   }, [basketItems]);
-// user
 
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <Layout user={user} updateUser={setUser} basketQty={basketQty} />
-        }
-      >
+    <BrowserRouter>
+      <Routes>
         <Route
           path="/"
-          element={
-            user ? (
+          element={<Layout user={user?.email} basketQty={basketQty} />}
+        >
+          <Route path="/auth" element={<Auth />} />
+          <Route
+            path="/menu"
+            element={
               <Home
-                user={user}
+                user={user?.email}
                 menuitems={menuitems}
                 toggleGrid={toggleGrid}
                 setToggleGrid={setToggleGrid}
@@ -2089,94 +234,88 @@ const App = () => {
                 setVenueNtable={setVenueNtable}
                 venues={venues}
               />
-            ) : (
-              <Auth user={user} setUser={setUser} />
-            )
-          }
-        >
-          {menuitems.map((category, index) => (
-            <Route
-              key={index}
-              path={category.name}
-              element={<MenuItem item={category} />}
-            >
-              {category.items.map((item, itemIndex) => (
+            }
+          >
+            {menuitems &&
+              menuitems.map((category, index) => (
                 <Route
-                  key={itemIndex}
-                  path={item.name}
-                  element={
-                    <MenuItemDetails
-                      menuitems={menuitems}
-                      item={item}
-                      basketItems={basketItems}
-                      setBasketItems={setBasketItems}
+                  key={index}
+                  path={category.name}
+                  element={<MenuItem item={category} />}
+                >
+                  {category.items.map((item, itemIndex) => (
+                    <Route
+                      key={itemIndex}
+                      path={item.name}
+                      element={
+                        <MenuItemDetails
+                          menuitems={menuitems}
+                          item={item}
+                          basketItems={basketItems}
+                          setBasketItems={setBasketItems}
+                        />
+                      }
                     />
-                  }
-                />
+                  ))}
+                </Route>
               ))}
-            </Route>
-          ))}
+          </Route>
+          <Route path="/receipts" element={<Receipts user={user?.email} />} />
+          <Route
+            path="/basket"
+            element={
+              <Basket
+                user={user?.email}
+                menuitems={menuitems}
+                basketItems={basketItems}
+                setBasketItems={setBasketItems}
+                venueNtable={{
+                  venue: getVenueById(venues, venueNtable.venue),
+                  table: venueNtable.table,
+                }}
+                setVenueNtable={setVenueNtable}
+              />
+            }
+          />
+          <Route
+            path="/payment"
+            element={<Payment user={user?.email} basketQty={basketQty} />}
+          />
+          <Route
+            path="/paymentcomplete"
+            element={
+              <PaymentComplete
+                user={user?.email}
+                venueNtable={{
+                  venue: getVenueById(venues, venueNtable.venue),
+                  table: venueNtable.table,
+                }}
+                menuitems={menuitems}
+                venues={venues}
+                basketItems={basketItems}
+                setBasketItems={setBasketItems}
+              />
+            }
+          />
+          <Route path="/settings" element={<Settings user={user?.email} />} />
+
+          <Route path="/contact" element={<Contact user={user?.email} />} />
+          <Route path="/faq" element={<FAQ user={user?.email} />} />
+          <Route
+            path="/notifications"
+            element={<Notifications user={user?.email} />}
+          />
+          <Route path="/news" element={<News user={user?.email} />} />
+          <Route path="/privacy" element={<Privacy user={user?.email} />} />
+          <Route path="/symbol" element={<Symbol user={user?.email} />} />
+          <Route path="/t&c" element={<TC user={user?.email} />} />
+
+          <Route path="/signout" element={<Signout />} />
+
+          <Route path="*" element={<Page404 />} />
         </Route>
-        <Route
-          path="/Receipts"
-          element={<Receipts user={user}/>}
-        />
-        <Route
-          path="/Basket"
-          element={
-            <Basket
-              user={user}
-              menuitems={menuitems}
-              basketItems={basketItems}
-              setBasketItems={setBasketItems}
-              venueNtable={{
-                venue: getVenueById(venues, venueNtable.venue),
-                table: venueNtable.table,
-              }}
-              setVenueNtable={setVenueNtable}
-            />
-          }
-        />
-        <Route
-          path="/Payment"
-          element={<Payment user={user} basketQty={basketQty} />}
-        />
-        <Route
-          path="/PaymentComplete"
-          element={
-            <PaymentComplete
-              user={user}
-              venueNtable={{
-                venue: getVenueById(venues, venueNtable.venue),
-                table: venueNtable.table,
-              }}
-              menuitems={menuitems}
-              venues={venues}
-              basketItems={basketItems}
-              setBasketItems={setBasketItems}
-            />
-          }
-        />
-        <Route path="/Settings" element={<Settings user={user} />} />
-
-        <Route path="/Contact" element={<Contact user={user} />} />
-        <Route path="/FAQ" element={<FAQ user={user} />} />
-        <Route path="/Notifications" element={<Notifications user={user} />} />
-        <Route path="/News" element={<News user={user} />} />
-        <Route path="/Privacy" element={<Privacy user={user} />} />
-        <Route path="/Symbol" element={<Symbol user={user} />} />
-        <Route path="/T&C" element={<TC user={user} />} />
-
-        <Route
-          path="/Signout"
-          element={
-            <Signout setUser={setUser} setVenueNtable={setVenueNtable} />
-          }
-        />
-
-        <Route path="*" element={<Page404 />} />
-      </Route>
-    </Routes>
+      </Routes>
+    </BrowserRouter>
   );
 };
 

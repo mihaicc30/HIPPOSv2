@@ -1,22 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AiOutlineLeft } from "react-icons/ai";
-import Allergens from "../Modals/Allergens"
-import { CheckAccess } from "../../utils/CheckAccess";
+import Allergens from "../Modals/Allergens";
 
 const MenuItemDetails = ({ item, basketItems, setBasketItems, menuitems }) => {
   const navigate = useNavigate();
 
-  useEffect(() => {
-		(async () => {
-		  if (!(await CheckAccess("menu"))) navigate("/signout");
-		})();
-	  }, []);
-
   const [quantity, setQuantity] = useState(1);
-  const [modal, setModal] = useState(false)
+  const [modal, setModal] = useState(false);
   const decreaseQuantity = () => {
-
     if (quantity > 1) {
       setQuantity(quantity - 1);
     }
@@ -77,10 +69,9 @@ const MenuItemDetails = ({ item, basketItems, setBasketItems, menuitems }) => {
 
   return (
     <div className="fixed inset-0 z-20 bg-[--c60] flex flex-col overflow-auto">
-		
-	{modal && <Allergens data={item} modal={modal} setModal={setModal}/>}
+      {modal && <Allergens data={item} modal={modal} setModal={setModal} />}
       <img
-        src={"../" + item.img}
+        src={"../." + item.img}
         className="h-[100px] w-[100%]"
         style={{ objectFit: "cover", overflow: "hidden" }}
       />
@@ -106,7 +97,10 @@ const MenuItemDetails = ({ item, basketItems, setBasketItems, menuitems }) => {
             item.tag.map((item, index) => <span key={index}>{item}</span>)}
         </div>
 
-        <button onClick={()=>setModal(!modal)} className="bg-[--c1] rounded mt-4 mx-auto px-6 py-1 font-bold border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none max-w-[500px]">
+        <button
+          onClick={() => setModal(!modal)}
+          className="bg-[--c1] rounded mt-4 mx-auto px-6 py-1 font-bold border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none max-w-[500px]"
+        >
           Allergen Info
         </button>
       </div>

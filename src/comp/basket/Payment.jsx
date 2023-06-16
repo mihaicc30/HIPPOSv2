@@ -23,20 +23,13 @@ const stripePromise = loadStripe(import.meta.env.VITE_S_PK);
 const Payment = ({ user }) => {
   const nav = useNavigate();
 
-  
   useEffect(() => {
     if (!user) return nav("/");
-    (async () => {
-      if (!(await CheckAccess("receipts"))) nav("/signout");
-    })();
   }, []);
 
-  
   const location = useLocation();
   const data = location.state?.totalPrice;
   const computedBasket = location.state?.computedBasket;
-
-
 
   const options = {
     mode: "payment",
@@ -126,7 +119,7 @@ const CheckoutForm = ({ data, computedBasket }) => {
       const res = await fetch(api, {
         method: "POST",
         headers: {
-          "auth-token": localStorage.getItem("jwtToken"),
+          
           "Content-Type": "application/json",
           "Access-Control-Allow-Credentials": true,
         },

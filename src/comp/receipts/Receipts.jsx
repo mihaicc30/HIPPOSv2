@@ -1,24 +1,43 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./Receipts.css";
 import { useNavigate } from "react-router-dom";
-import { CheckAccess } from "../../utils/CheckAccess";
 
 const Receipts = ({ user }) => {
   const nav = useNavigate();
-  
-  const [receipts, setReceipts] = useState([])
+
+  const [receipts, setReceipts] = useState([]);
   const [searchReceipts, setSearchReceipts] = useState("");
   const searchInputRef = useRef(null);
 
   useEffect(() => {
-    console.log("RRRRRRRRRRRR");
-    if (!user) return nav("/");
-
-    (async () => {
-      if (!(await CheckAccess("receipts"))) nav("/signout");
-    })();
+    if (!user) return;
     searchInputRef.current.focus();
-  }, []);
+
+    const getReceipts = async () => {
+      try {
+        const query = await fetch(`${import.meta.env.VITE_API}receipts`, {
+          method: "POST",
+          headers: {
+            
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Credentials": true,
+          },
+          body: JSON.stringify({
+            v: import.meta.env.VITE_G,
+            email: user,
+          }),
+        });
+
+        if (query.status === 200) {
+          const response = await query.json();
+          setReceipts(response);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getReceipts();
+  }, [user]);
 
   const getUniqueYears = () => {
     const years = new Set(receipts.map((receipt) => receipt.year));
@@ -53,6 +72,23 @@ const Receipts = ({ user }) => {
         </button>
       </div>
 
+      {receipts.length < 1 && (
+        <div>
+          <p className="text-center my-auto under text-xl">
+            You have no orders.{" "}
+          </p>
+          <p className="text-center my-auto under text-xl">
+            Just check our delicious menu!
+            <button
+              className="bg-[--c1] rounded px-3 py-1 font-bold border-b-2 border-b-[--c2] text-[--c2] relative inline-block shadow-xl active:shadow-black active:shadow-inner disabled:bg-[#cecdcd] disabled:text-[#ffffff] disabled:active:shadow-none text-3xl"
+              onClick={() => nav("/")}
+            >
+              📲
+            </button>
+          </p>
+        </div>
+      )}
+
       {getUniqueYears().map((year) => (
         <details className="pl-1" key={year}>
           <summary className="py-2 border-b-2 bg-[--c12]">{year}</summary>
@@ -61,7 +97,7 @@ const Receipts = ({ user }) => {
               <summary>{month}</summary>
               {receipts
                 .filter((receipt) =>
-                  receipt.receiptNumber.includes(searchReceipts)
+                  String(receipt.receiptNumber).includes(searchReceipts)
                 )
                 .map((receipt, index) => {
                   if (receipt.year === year && receipt.month === month) {
@@ -98,7 +134,7 @@ const Receipts = ({ user }) => {
                                   {receipt.items.map((item, itemIndex) => (
                                     <tr key={itemIndex} className="text-center">
                                       <td className="line-clamp-2 border-2">
-                                        {item.item}
+                                        {item.name}
                                       </td>
                                       <td className="border-2">{item.qty}</td>
                                       <td className="border-2">

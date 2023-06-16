@@ -10,7 +10,6 @@ export const CheckAccess = async (path) => {
       v: import.meta.env.VITE_G,
     }),
   });
-
-  console.log(query.status);
+  console.log("query.status", query.status);
   return query.status === 200;
 };

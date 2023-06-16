@@ -3,7 +3,7 @@ import "./Signout.css";
 import { useNavigate } from "react-router-dom";
 import { FiLoader } from "react-icons/fi";
 
-const Signout = ({ setVenueNtable, setUser }) => {
+const Signout = ({ setVenueNtable}) => {
   const nav = useNavigate();
   useEffect(() => {
     
@@ -22,7 +22,6 @@ const Signout = ({ setVenueNtable, setUser }) => {
         }),
       });
       setVenueNtable({ venue: null, table: null });
-      setUser(null);
       localStorage.clear();
       nav("/");
     }, 100);

@@ -18,25 +18,25 @@ const MobileFooter = ({basketQty}) => {
 		nav(`/${index}`);
 	};
 
-	const menuPaths = ["/", "/Desserts", "/Breakfast", "/Kids%20Starters", "/Kids%20Mains", "/Drinks", "/Starters", "/Mains"];
+	const menuPaths = ["/menu", "/desserts", "/breakfast", "/kids%20starters", "/kids%20mains", "/drinks", "/starters", "/mains"];
 
 	return (
 		<div className="MobileFooter basis-[10%] flex justify-center gap-4 bg-[--c60] py-4 relative max-md:gap-1">
 			<div
 				className={`basis-[18%] transition-all cursor-pointer hover:scale-[0.98] active:scale-[0.90] rounded-3xl flex flex-col text-center text-lg justify-center font-semibold ${
-					menuPaths.includes(loc.pathname) ? "MAFA" : ""  ? "MAFA" : ""
+					loc.pathname === "/menu" ? "MAFA" : ""  ? "MAFA" : ""
 				}`}
-				onClick={() => handleDivClick("")}>
+				onClick={() => handleDivClick("menu")}>
 				<span className="mx-auto text-3xl">
 					<MdRestaurantMenu />
 				</span>
-				<p className={activeIndex === "" ? "" : "max-sm:hidden"}>Menu</p>
+				<p className={activeIndex === "menu" ? "" : "max-sm:hidden"}>Menu</p>
 			</div>
 			<div
 				className={`basis-[18%] transition-all cursor-pointer hover:scale-[0.98] active:scale-[0.90] rounded-3xl flex flex-col text-center text-lg justify-center font-semibold ${
 					loc.pathname === "/Receipts" ? "MAFA" : ""
 				}`}
-				onClick={() => handleDivClick("Receipts")}>
+				onClick={() => handleDivClick("receipts")}>
 				<span className="mx-auto text-2xl">
 					<BsLayoutTextWindowReverse />
 				</span>

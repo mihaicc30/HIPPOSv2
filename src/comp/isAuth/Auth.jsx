@@ -1,13 +1,32 @@
 import React, { useState, useEffect } from "react";
+import {
+  db,
+  auth,
+  logInWithEmailAndPassword,
+  signInWithGoogle,
+  signInWithPopup,
+  signInWithFacebook,
+} from "../../firebase/config.jsx";
+import { useAuthState } from "react-firebase-hooks/auth";
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+} from "firebase/auth";
+
 import { FcGoogle } from "react-icons/fc";
 import { BsFacebook } from "react-icons/bs";
 import { useLocation, useNavigate } from "react-router-dom";
 
-const Auth = ({ user, setUser }) => {
+const Auth = () => {
+  const [user, loading, error] = useAuthState(auth);
+
+  useEffect(()=>{
+    if(user) nav("/menu")
+  },[user])
+
   const [loginState, setLoginState] = useState(true);
   const location = useLocation();
   const nav = useNavigate();
-  const [loading, setLoading] = useState(false);
   const [err, setErr] = useState({
     email: "",
     password: "",
@@ -15,13 +34,8 @@ const Auth = ({ user, setUser }) => {
     general: "",
   });
 
-  useEffect(() => {
-    if (user) return nav("/");
-  }, []);
-
   const performValidation = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
     let submit = true;
     const email = e.target.email.value;
@@ -82,7 +96,6 @@ const Auth = ({ user, setUser }) => {
       }
     }
 
-    if (!submit) return setLoading(false);
     setErr({
       email: "",
       password: "",
@@ -90,40 +103,20 @@ const Auth = ({ user, setUser }) => {
       general: "",
     });
 
-    const query = await fetch(
-      `${import.meta.env.VITE_API}${loginState ? "login" : "register"}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Credentials": true,
-        },
-        body: JSON.stringify({
-          v: import.meta.env.VITE_G,
-          email: email,
-          password: password,
-        }),
-      }
-    );
-    if (query.status == 200) {
-      setLoading(false);
-      const response = await query.json();
-      localStorage.setItem("jwtToken", response.jwtToken);
-      setUser(email);
-      e.target.email.value = "";
-      e.target.password.value = "";
-
-      if (!loginState) {
-        e.target.password2.value = "";
-      }
-    } else {
-      setLoading(false);
-      const err = await query.json();
-      setErr((prevErr) => ({
-        ...prevErr,
-        general: err.error,
-      }));
+    console.log("loginState", loginState);
+    if (!loginState) {
+      const res = await createUserWithEmailAndPassword(auth, email, password);
+      console.log(res.user);
+      const user = res.user;
+    } else if (loginState) {
+      const res = await signInWithEmailAndPassword(auth, email, password);
+      console.log(res.user);
+      const user = res.user;
     }
+  };
+
+  const handleGoogle = () => {
+    window.open("https://www.mozilla.org/", "_self", "popup");
   };
 
   return (
@@ -143,7 +136,15 @@ const Auth = ({ user, setUser }) => {
           </div>
           <div className="text-center">
             <div className="my-4 py-4 flex justify-center gap-10 text-[3rem]">
-              <FcGoogle className="transition hover:scale-[1.2] cursor-pointer text-[3.3rem]" />
+              <button
+                onClick={() => document.documentElement.requestFullscreen()}
+              >
+                req fs
+              </button>
+              <FcGoogle
+                className="transition hover:scale-[1.2] cursor-pointer text-[3.3rem]"
+                onClick={signInWithGoogle}
+              />
               <BsFacebook
                 style={{ fill: "#4267B2" }}
                 className="transition hover:scale-[1.2] cursor-pointer"
@@ -169,7 +170,7 @@ const Auth = ({ user, setUser }) => {
               {err.email && <p>{err.email}</p>}
               <input
                 name="password"
-                type="text"
+                type="Password"
                 placeholder="Password"
                 defaultValue=""
                 required
@@ -179,7 +180,7 @@ const Auth = ({ user, setUser }) => {
 
               <input
                 name="password2"
-                type="text"
+                type="Password"
                 placeholder="Confirm Password"
                 defaultValue=""
                 required
@@ -192,7 +193,7 @@ const Auth = ({ user, setUser }) => {
                   🔴 {err.general}
                 </p>
               )}
-               {loading ? (
+              {loading ? (
                 <div className="ui-loader loader-blk mx-auto animate-fadeUP1 mt-10">
                   <svg viewBox="22 22 44 44" className="multiColor-loader">
                     <circle
@@ -231,7 +232,7 @@ const Auth = ({ user, setUser }) => {
               {err.email && <p>{err.email}</p>}
               <input
                 name="password"
-                type="text"
+                type="Password"
                 placeholder="Password"
                 defaultValue="mihaic@gmail.com"
                 required

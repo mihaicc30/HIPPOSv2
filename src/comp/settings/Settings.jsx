@@ -1,18 +1,13 @@
 import React, { useEffect } from "react";
 import "./Settings.css";
 import { NavLink, useNavigate } from "react-router-dom";
-import { CheckAccess } from "../../utils/CheckAccess";
-
 import { AiFillCaretRight } from "react-icons/ai";
 
-const Settings = ({ user, setUser }) => {
+const Settings = ({ user }) => {
   const nav = useNavigate();
 
   useEffect(() => {
     if (!user) return nav("/");
-    (async () => {
-      if (!(await CheckAccess("receipts"))) nav("/signout");
-    })();
   }, []);
 
   return (
